@@ -260,7 +260,7 @@ namespace Viman.Models
             try
             {
                 string duffelBaseUrl = "https://api.duffel.com";
-                string duffelAccessToken = "duffel_test_EvUkj78GJeLB_cXpl43aedOT9vhpSwgABXMeUYr7nd4";
+                string duffelAccessToken = "";
 
                 if (string.IsNullOrEmpty(duffelAccessToken)) return resultModel;
 
@@ -368,7 +368,7 @@ namespace Viman.Models
                 if (bookFlights.Flights.ProviderData == null) return false;
 
                 string duffelBaseUrl = "https://api.duffel.com";
-                string duffelAccessToken = "duffel_test_EvUkj78GJeLB_cXpl43aedOT9vhpSwgABXMeUYr7nd4";
+                string duffelAccessToken = "";
 
                 if (string.IsNullOrEmpty(duffelAccessToken)) return false;
 
