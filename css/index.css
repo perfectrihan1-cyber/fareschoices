@@ -1,0 +1,993 @@
+@import url(/style.css);
+
+.newheader {
+    background: #ffffff !important;
+    z-index: 999;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+.newheader .newhead {
+    width: 90%;
+    margin: auto;
+    border: 0;
+    padding: 10px 20px;
+    border-radius: 100px;
+}
+
+.newheader .left {
+    margin: auto 0;
+    max-width: fit-content;
+}
+
+.newheader .left img {
+    width: 130px;
+}
+
+.newheader .right {
+    margin: auto 0;
+}
+
+.newheader .right button {
+    background-color: var(--fourth-color);
+    cursor: pointer;
+    color: var(--fifth-color) !important;
+    box-shadow: 0 0 5px 5px rgb(20, 20, 20, 0.1);
+}
+
+.newheader .right button:hover {
+    background-color: var(--fourth-color);
+}
+
+.newheader.scrolled {
+    background-color: var(--fifth-color);
+}
+
+.navigate {
+    margin: auto 0;
+}
+
+.navigate ul {
+    display: flex;
+    list-style-type: none;
+    gap: 10px;
+    margin-bottom: 0;
+    background-color: transparent;
+    justify-content: center;
+}
+
+.navigate nav ul li a.active {
+    border-color: var(--fourth-color) !important;
+    background-color: rgb(255, 255, 255, 0.1) !important;
+}
+
+.navigate a {
+    color: #000000 !important;
+    transition: border-color 0.5s ease-in-out;
+    padding: 7px 15px;
+    border-radius: 50px;
+    border: 1px solid transparent;
+}
+
+.navigate li {
+    background-color: transparent;
+    margin: 0;
+    padding: 0 5px;
+    cursor: pointer;
+}
+
+.navigate li:hover a {
+    color: var(--third-color) !important;
+    background-color: var(--fourth-color);
+}
+
+form .pass {
+    margin: auto 0 auto auto;
+    gap: 10px;
+}
+
+form .radio {
+    display: flex;
+    gap: 20px;
+}
+
+form .radio #rdoRoundtrip,
+form .radio #rdoOneway {
+    width: 15px;
+    margin-left: 0 !important;
+}
+
+form .radio label {
+    margin-top: 0;
+}
+
+::placeholder {
+    color: #676767;
+    font-size: 15px;
+}
+
+input,
+select,
+textarea {
+    line-height: 1em !important;
+    background-color: var(--fourth-color);
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #cacaca;
+    border-radius: 5px;
+}
+
+label {
+    flex: 1;
+    font-family: var(--secondary-font);
+    font-size: 16px;
+    margin-top: 10px;
+    text-align: left;
+    font-weight: 400;
+}
+
+form div {
+    gap: 5px;
+}
+
+form .dropdown-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+form .dropdown-input {
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
+form .dropdown-content {
+    padding: 10px;
+    border-radius: 10px;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border: 1px solid #ddd;
+}
+
+form .dropdown-content .dropdown-group {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+form .dropdown-content .dropdown-group:last-child {
+    border-bottom: none;
+}
+
+form .dropdown-content label {
+    margin-right: 10px;
+}
+
+form .qty {
+    cursor: pointer;
+    width: 30px;
+    text-align: center;
+}
+
+form .qtyminus,
+form .qtyplus {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    font-size: 18px;
+}
+
+form .dropdown-content input[type="text"] {
+    width: 50px;
+    text-align: center;
+}
+
+form .form-control {
+    border: 1px solid #cacaca;
+    padding: 10px 12px !important;
+}
+
+.herobg {
+    background-image: linear-gradient(to bottom, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/banner.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.contact form {
+    margin-top: 10px;
+}
+
+.contact form button {
+    width: 100px;
+}
+
+.contact form input {
+    padding: 15px;
+    border: 1px solid #cacaca;
+    border-radius: 5px;
+}
+
+.contact .right h2 {
+    background-color: var(--third-color);
+    color: var(--fourth-color) !important;
+    padding: 5px 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.contact .right .grid {
+    gap: 10px;
+    margin-block: 10px;
+}
+
+.contact .right .colum {
+    border: 1px solid #cacaca;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.contact h3,
+.contact p {
+    margin: auto 0 !important;
+}
+
+.cta {
+    background-color: var(--third-color);
+    padding: 5px 15px 5px 5px;
+    position: fixed;
+    left: 10px;
+    border: 1px solid var(--fourth-color);
+    bottom: 10px;
+    z-index: 999;
+    display: none;
+    border-radius: 50px;
+    width: fit-content;
+}
+
+.cta i {
+    background-color: var(--fourth-color);
+    color: var(--third-color);
+    padding: 10px;
+    border-radius: 100%;
+}
+
+.cta .flex {
+    gap: 10px;
+}
+
+.cta div,
+.cta h3 {
+    margin: auto 0 !important;
+}
+
+.cta h4 {
+    color: var(--fourth-color) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5;
+}
+
+.BannerBg {
+    background-image: linear-gradient(to bottom, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/train-banner.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+}
+
+.BannerBg .row {
+    padding-top: 150px;
+}
+
+.BannerBg h1,
+.BannerBg p {
+    color: var(--fourth-color) !important;
+}
+
+.BannerBg .radio {
+    width: fit-content;
+    margin: auto auto 15px;
+}
+
+.BannerBg form {
+    background-color: var(--fourth-color);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+
+.BannerBg .flex,
+.BannerBg .d-flex {
+    gap: 0;
+}
+
+.BannerBg .col3 {
+    gap: 5px;
+    z-index: 9;
+    position: relative;
+}
+
+.BannerBg .col3 .labelcol {
+    border-radius: 5px;
+    background-color: var(--fourth-color);
+    padding: 15px !important;
+    border: 1px solid var(--third-color);
+}
+
+.BannerBg .col3 .column,
+.BannerBg .col3 > div {
+    flex: 1;
+}
+
+.BannerBg .col3 input,
+.BannerBg .col3 select {
+    padding: 0 0 0 22px !important;
+    margin-bottom: 0 !important;
+    background-color: transparent;
+    background-position-x: 2px;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: 15px;
+    border: 0;
+    margin-top: 0;
+    border-radius: 0;
+}
+
+.BannerBg .col3 #flight_from {
+    background-image: url(/images/train-departure.png);
+}
+
+.BannerBg .col3 #flight_to {
+    background-image: url(/images/train-departure.png);
+}
+
+.BannerBg .col3 #from,
+.BannerBg .col3 #to {
+    background-image: url(/images/calendar-new.png);
+}
+
+.BannerBg .col3 #pass_info {
+    background-image: url(/images/passengers.png);
+}
+
+.BannerBg .search_flights {
+    text-align: center;
+    flex: none !important;
+    margin-top: 10px;
+    margin: auto 0;
+}
+
+.BannerBg #flight_submit {
+    width: fit-content;
+    font-size: 18px !important;
+    text-transform: none;
+    padding: 15px 20px !important;
+    box-shadow: 0 0 5px 5px rgb(255, 255, 255, 0.3);
+}
+
+.usps img {
+    height: 50px;
+    margin-bottom: auto;
+}
+
+.usps p {
+    line-height: 1.5;
+}
+
+.usps .column {
+    gap: 15px;
+}
+
+.textmedia .column:first-child {
+    background-color: #eee;
+    padding: 40px;
+}
+
+.textmedia .column:first-child div {
+    text-align: right;
+}
+
+.textmedia .Border {
+    padding: 3px;
+    margin-bottom: 10px;
+    border-bottom: 2px dotted var(--primary-color);
+}
+
+.textmedia button {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color) !important;
+    padding-block: 2px !important;
+}
+
+.textmedia .column:last-child {
+    background-image: url(/images/Vacations.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.mainslider1 .slider-container2,
+.mainslider2 .slider-container3 {
+    position: relative;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.mainslider1 .slider2,
+.mainslider2 .slider3 {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.mainslider1 .slide2,
+.mainslider2 .slide3 {
+    min-width: calc(25% - 16px);
+    max-width: calc(25% - 16px);
+}
+
+.mainslider1 .prev-btn2,
+.mainslider1 .next-btn2,
+.mainslider2 .prev-btn3,
+.mainslider2 .next-btn3 {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--fourth-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    width: fit-content;
+    z-index: 99;
+}
+
+.mainslider1 .prev-btn2,
+.mainslider2 .prev-btn3 {
+    left: 10px;
+}
+
+.mainslider1 .next-btn2,
+.mainslider2 .next-btn3 {
+    right: 10px;
+}
+
+.mainslider1 .row,
+.mainslider2 .row {
+    padding-block:0;
+}
+
+.newbg {
+    background-image: url(/images/bottom-banner.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+}
+
+.newbg img {
+    height: 30px;
+}
+
+.newbg .column {
+    background-color: #eee;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.routes .grid {
+    margin-top: 15px;
+}
+
+.routes .flex {
+    border: 1px solid var(--secondary-color);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.routes h3:nth-child(3) {
+    text-align: right;
+}
+
+.routes h3:not(:nth-child(2)) {
+    flex: 1;
+}
+
+.routes .flex:hover {
+    background-color: var(--secondary-color);
+}
+
+.routes .flex:hover h3 {
+    color: var(--fourth-color) !important;
+}
+
+.routes h2 {
+    text-align: center;
+}
+
+.mainslider1 .slide2 .imgcol {
+    height: 350px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    align-items: end;
+    display: flex;
+    border-radius: 20px;
+    padding:20px;
+}
+
+.mainslider1 .slide2 h3 {
+    color: var(--fourth-color) !important;
+}
+
+.disabled {
+    opacity: 0;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.blogpage input {
+    border: 1px solid var(--secondary-color);
+    padding-inline:15px;
+    margin-right: 10px;
+}
+
+.blogpage .datepara {
+    background: var(--secondary-color);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius:10px 10px 0 0;
+}
+
+.blogpage img {
+    width:100%;
+}
+
+.blogpage article {
+    background:#eee;
+    border-radius: 10px;
+}
+
+.blogpage section {
+    padding:20px;
+}
+
+.blogpage section p {
+    line-height: 1.4;
+        height: calc(1.4em * 2);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+}
+
+.blogpage hr {
+    margin-block: 10px;
+}
+
+.blogpage #next-btn {
+    background: var(--primary-color);
+    padding: 0 7px;
+    border: 0;
+    border-radius:0 10px 10px 0;
+    color: #fff;
+}
+
+.blogpage #prev-btn {
+    background: var(--primary-color);
+    padding: 0 7px;
+    border: 0;
+    border-radius: 10px 0 0 10px;
+    color: #fff;
+}
+
+.blogpage #page-number {
+    background: #fff;
+    padding: 0 5px;
+}
+
+.blogpage #page-number button {
+    padding: 3px 10px;
+    border:0;
+}
+
+.blogpage .active {
+    background: var(--secondary-color);
+    color:#fff;
+}
+
+.TrainSeat img {
+    width: 100%;
+    border-radius: 10px 0 0 10px;
+}
+
+.TrainSeat .grid {
+    gap: 0;
+}
+
+.TrainSeat .content {
+    background: var(--secondary-color);
+    padding: 40px;
+    border-radius: 0 10px 10px 0;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.TrainSeat h2, .TrainSeat p {
+    color: var(--fourth-color) !important;
+}
+
+.TrainSeat button {
+    background-color: var(--fourth-color);
+    border-radius: 25px;
+    color: var(--fifth-color) !important;
+    margin-top: 10px;
+}
+
+.HOTELS .row {
+    padding-block: 0;
+}
+
+.HOTELS img {
+    width: 100%;
+    border-radius: 10px;
+}
+.HOTELS .innercol {
+    padding: 30px;
+    border-radius: 10px;
+    background-color: antiquewhite;
+    margin-top: 250px;
+    height: 215px;
+}
+.HOTELS .column {
+    background-position:top;
+    background-repeat:no-repeat;
+    background-size: 100%;
+    border-radius: 10px;
+}
+.HOTELS button {
+    border-radius: 25px;
+    margin-top: 10px;
+    background-color: var(--fifth-color);
+}
+
+.mainslider2 img {
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+}
+
+.mainslider2 .innercol {
+    border: 1px solid #cacaca;
+    padding: 15px;
+    border-radius: 0 0 20px 20px;
+}
+
+.mainslider2 .button {
+    width: fit-content;
+    margin-top: 10px;
+    padding-block: 0 !important;
+}
+
+.mainslider2 p:not(:first-child) {
+    line-height: 1.25 !important;
+    font-size: 15px;
+}
+
+.mainslider2 p:first-child {
+    background-color: rgb(250, 198, 36);
+    margin-bottom: 10px;
+    width: fit-content;
+    padding: 0 10px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.subsribeSec .column {
+    background-image: url(/images/Vacations.jpg);
+    border-radius: 15px;
+    padding: 75px 50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 503px;
+    align-items: center;
+}
+
+.subsribeSec .colum {
+    background-color: var(--primary-color);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.subsribeSec button {
+    background-color: var(--fourth-color);
+    border: 1px solid var(--fourth-color);
+    color: var(--fifth-color) !important;
+    border-radius: 50px;
+    width: 150px;
+}
+
+.subsribeSec h2 {
+    color: #fff !important;
+}
+
+.subsribeSec p {
+    color: #fff;
+    line-height: 1.5;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.FAQ .row {
+    padding-top:0;
+}
+
+.FAQ .faqhead {
+    display: flex;
+}
+
+.FAQ .faqs {
+    padding: 10px 0;
+    border-bottom: 1px solid #cacaca;
+}
+
+.FAQ .fa-caret-up,
+.FAQ .faqdetails {
+    display: none;
+}
+
+.FAQ h3:first-child {
+    flex: 1;
+}
+
+.FAQ .colum {
+    margin-bottom: auto;
+}
+
+.FAQ .grid {
+    margin-top: 15px;
+}
+
+.show {
+    display: block !important;
+}
+
+.overview {
+    text-align:center;
+}
+
+.overview h2 {
+    color: var(--secondary-color) !important;
+}
+
+.overview p span, .overview .col i {
+    color: #cacaca;
+    text-align:center;
+}
+
+.overview .col {
+    border: 1px solid #cacaca;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.overview .col b {
+    color: var(--secondary-color);
+}
+
+.overview .grid4 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    background: rgba(0,0,0,0.4);
+}
+
+.popup .column {
+    max-width: 450px;
+    text-align: center;
+    
+}
+
+.popup img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.popup.active {
+    display: flex;
+}
+
+
+
+
+
+
+
+
+
+
+  .container12 {
+    background-color: #1f2c3c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container13 {
+    text-align: center;
+    color: white;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .container13 h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .container13 p {
+    font-size: 16px;
+    margin-bottom: 20px;
+	color: white !important;
+  }
+
+  .contact-btn11 {
+    background-color: #017ad6;
+    color: white !important;
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  .booking-card11 {
+    background-color: white;
+    color: #1f2c3c;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  .booking-card11 h2 {
+    margin-bottom: 5px;
+  }
+
+  .booking-card11 small {
+    display: block;
+    margin-bottom: 15px;
+    color: #555;
+  }
+
+  .queue-box11 {
+    background-color: #003366;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .queue-box11 a {
+    color: #00ffcc !important;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .container13 h1 {
+      font-size: 20px;
+    }
+    .container13 p {
+      font-size: 14px;
+    }
+    .booking-type11 {
+      flex-direction: column;
+    }
+    .booking-type11 button {
+      width: 100%;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+       
+
+        table {
+            width: 100%;
+			margin: 30px 0 !important;
+            border-collapse: collapse;
+			font-size: 20px !important;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+
+        th {
+            padding: 18px 20px !important;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            position: relative;
+        }
+
+        th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        tbody tr {
+			
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgb(0 0 0 / 7%);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: scale(1.01);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        td {
+            padding: 16px 20px !important;
+            color: black;
+            font-size: 14px;
+        }
+
+       
+        @media (max-width: 480px) {
+    table {
+            width: 100%;
+			margin: 30px 0 !important;
+            border-collapse: collapse;
+			font-size: 13px !important;
+        }
+  }
+  
+  
+ul {list-style-type: disc;}
+
+ol {list-style-type: decimal;}

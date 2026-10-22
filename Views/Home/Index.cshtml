@@ -1,0 +1,372 @@
+﻿@using Viman.Models
+
+@{
+    ViewBag.PageName = "home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+
+}
+
+@section metatags{
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="~/images/favicon.ico">
+    <title>Find Best Flight Deals, Cheap Airfare | Fareschoices</title>
+    <meta name="description" content="Find the best Flight deals with Fareschoices. Compare airfares from top airlines and save big on your next trip. Easy booking and 24/7 support." />
+    <link rel="canonical" href="https://www.Fareschoices.com" />
+    <meta property="og:title" content="Find Best Flight Deals, Cheap Airfare | Fareschoices" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.Fareschoices.com/images/logo.png" />
+    <meta name="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Fareschoices" />
+    <meta property="og:description" content="Find the best Flight deals with Fareschoices. Compare airfares from top airlines and save big on your next trip. Easy booking and 24/7 support." />
+    <meta property="og:url" content="https://www.Fareschoices.com" />
+    <meta name="author" content="Fareschoices.com" />
+    <meta name="geo.region" content="US-GA" />
+    <meta name="language" content="English" />
+    <meta name="robots" content="index,follow" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="Fareschoices" />
+    <meta name="twitter:title" content="Find Best Flight Deals, Cheap Airfare | Fareschoices" />
+    <meta name="twitter:description" content="Find the best Flight deals with Fareschoices. Compare airfares from top airlines and save big on your next trip. Easy booking and 24/7 support." />
+    <meta name="twitter:image" content="https://www.Fareschoices.com/images/logo.png" />
+
+}
+
+
+
+<div class="container BannerBg">
+    <div class="row">
+        <div class="column">
+            <h1>Your Travel – Your Fares Choices</h1>
+            @{Html.RenderPartial("~/Views/Shared/_SearchEngine.cshtml");}
+        </div>
+    </div>
+</div>
+
+<div class="container usps">
+    <div class="row grid grid2">
+        <div class="column flex">
+            <img src="/images/usp1.png" alt="Customised travel packages">
+            <div>
+                <h3>Customised travel packages</h3>
+                <p>Customized travel packages per your preferences.</p>
+            </div>
+        </div>
+        <div class="column flex">
+            <img src="/images/usp2.png" alt="Affordable Flight Tickets">
+            <div>
+                <h3>Affordable Flight Tickets</h3>
+                <p>Lowest fares, last-minute deals always.</p>
+            </div>
+        </div>
+        <div class="column flex">
+            <img src="/images/usp3.png" alt="">
+            <div>
+                <h3>24X7 live person assistance</h3>
+                <p>24/7 live support in your languages.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="container HOTELS">
+    <div class="row grid grid1">
+        <div class="column" style="background-image: url(/images/Book-Your-Amtrak-Train-Journey-Over-the-Phone.jpg);">
+            <div class="innercol">
+                <h3>Book Your Train Journey Over the Phone</h3>
+                <p>No online hassle | Live assistance | Special discounts on phone bookings</p>
+                <a href="tel:+18332636016"><button class="button">Call Now</button></a>
+            </div>
+        </div>
+        <div class="column" style="background-image: url(/images/Last-Minute-Getaways-with-Amtrak.jpg);">
+            <div class="innercol">
+                <h3>Last-Minute Getaways with Train</h3>
+                <p style="line-height: 1.5;">Grab exclusive last-minute deals on Train routes. Save on seasonal offers, weekend escapes, and popular destinations- limited seats available at discounted rates.</p>
+                <a href="tel:+18332636016"><button class="button">Call for Deals</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container TrainSeat">
+    <div class="row">
+        <div class="column grid grid1">
+            <div><img src="/images/Call-Now-Lock-Your-Train-Seat.jpg" alt="Call Now & Lock Your Train Seat" /></div>
+            <div class="content">
+                <h2>Call Now & Lock Your Train Seat!</h2>
+                <p>Book your Train tickets over the phone for personalized service, flexible options, and special assistance, fast and hassle-free.</p>
+                <a href="tel:+18332636016"><button class="button">Call to Book</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mainslider2">
+    <div class="row">
+        <div class="column">
+            <h2>Exclusive Travel Offers</h2>
+            <div class="slider-container3" data-show="4" data-gap="15">
+                <button class="prev-btn3 disabled">❮</button>
+                <button class="next-btn3">❯</button>
+                <div class="slider3" style="transform: translateX(0px);">
+                    <div class="slide3">
+                        <img src="/images/Cruises.jpg" alt="Cruises">
+                        <div class="innercol">
+                            <p><i class="fa-solid fa-ticket"></i> $90 off Cruises</p>
+                            <h3>Cruises</h3>
+                            <p>Get $90 off select Cruises!</p>
+                            <a href="tel:+18332636016"><button class="button">Book Now</button></a>
+                        </div>
+                    </div>
+                    <div class="slide3">
+                        <img src="/images/Vacation-packages.jpg" alt="Vacation packages">
+                        <div class="innercol">
+                            <p><i class="fa-solid fa-ticket"></i> 20% off Vacation packages</p>
+                            <h3>Vacation Packages</h3>
+                            <p>Save 20% off Vacation packages!</p>
+                            <a href="tel:+18332636016"><button class="button">Book Now</button></a>
+                        </div>
+                    </div>
+                    <div class="slide3">
+                        <img src="/images/Amtrak.jpg" alt="Amtrak">
+                        <div class="innercol">
+                            <p><i class="fa-solid fa-ticket"></i> 10% Discount on Trains</p>
+                            <h3>Train</h3>
+                            <p>Flat 10% off on all train reservations.</p>
+                            <a href="tel:+18332636016"><button class="button">Book Now</button></a>
+                        </div>
+                    </div>
+                    <div class="slide3">
+                        <img src="/images/Car-Rentals.jpg" alt="Car Rentals">
+                        <div class="innercol">
+                            <p><i class="fa-solid fa-ticket"></i> $75 off Car Rentals</p>
+                            <h3>Car Rentals</h3>
+                            <p>Get $75 off on Car Rentals!</p>
+                            <a href="tel:+18332636016"><button class="button">Book Now</button></a>
+                        </div>
+                    </div>
+                    <div class="slide3">
+                        <img src="/images/Hotels.jpg" alt="Hotels">
+                        <div class="innercol">
+                            <p><i class="fa-solid fa-ticket"></i> 20% off Hotels</p>
+                            <h3>Hotels</h3>
+                            <p>Tap to save 20% off hotels!</p>
+                            <a href="tel:+18332636016"><button class="button">Book Now</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container subsribeSec">
+    <div class="row">
+        <div class="column grid grid1">
+            <div class="colum">
+                <h2>Explore Vacations Around the World with Fareschoices</h2>
+                <p>We have a team of experts who help you manage and book your travel with the most reasonable fares choices. Hence, plan your world anywhere in the world with Fareschoices travel deals and vacation offers. It is an excellent start for you to find and fix the airfare deals with the most suitable offers to track the budget deals.</p>
+                <br>
+                <a href="tel:+18332636016"><button class="button">Call Us <i class="fa-solid fa-angle-right"></i></button></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mainslider1">
+    <div class="row">
+        <div class="column">
+            <h2>Discover the World’s Most Loved Destinations</h2>
+            <div class="slider-container2" data-show="4" data-gap="20">
+                <button class="prev-btn2 disabled">&#10094;</button>
+                <button class="next-btn2">&#10095;</button>
+                <div class="slider2">
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/New-York.jpg);">
+                                <h3>New York</h3>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/Las-Vegas1.jpg);">
+                                <h3>Las Vegas</h3>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/Los-Angeles1.jpg);">
+                                <h3>Los Angeles</h3>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/Miami1.jpg);">
+                                <h3>Miami</h3>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/Washington.jpg);">
+                                <h3>Washington D.C.</h3>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="slide2">
+                        <a href="">
+                            <div class="imgcol" style="background-image: linear-gradient(to top, rgb(20, 20, 20, 0.7), rgb(20, 20, 20, 0)), url(/images/Orlando1.jpg);">
+                                <h3>Orlando</h3>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="column">
+            <p>Travel planning has changed from the traditional sense of going on various websites, browsing through numerous prices, and confusion about the booking procedure. The modern-day travelers demand speed, transparency, and reliability on one platform. Fareschoices will fulfill these expectations, providing an easy way to book flights, hotels, and any travel services in a simplified way that does not introduce any complexities that are not necessary.</p>
+            <p>Planning any domestic trip or international trip, it seems to be one of the priorities to find the correct fares and good options. This is a website that allows competitive pricing, an easy-to-use tool, and a secure booking platform. This aims to guarantee that travelers make informed choices effortlessly. Each feature is created to make the booking process easier and remain flexible and valuable.</p>
+            <h2>A Direct Booking Platform Built for Modern Travelers</h2>
+            <p>Fareschoices is a direct booking platform, which enables passengers to make bookings effectively without being referred to other platforms that they may not know. This straightforwardness will improve trust, minimize reservation friction, and guarantee transparency during the reservation.</p>
+            <p>Through its collaboration with major airlines and travel operators, the platform provides real-time availability and real-time status of the prices. This is how the traveler can concentrate on the choice of the itinerary instead of doubting the accuracy of the fares shown.</p>
+            <h3>Convenient Search and Booking</h3>
+            <p>The platform is brought about in a simple manner. The search engine is easy to navigate and is desktop as well as mobile-friendly. Customers are able to make reservations within a few clicks, starting with the preliminary search command and ending with confirmation.</p>
+            <p>Guidelines, instructions, and organizing designs are guaranteed such that those who are not first-time users can book travel easily without the burden of having to figure out much or waste time in the process.</p>
+            <h3>Pricing with Transparent Fare Details</h3>
+            <p>Transparent pricing is one of the most treasured properties of this platform. Fare-related information, such as tax and other fees, is well shown in advance before the fare is confirmed.</p>
+            <p>Such openness eliminates confusion and enables tourists to make the right comparisons. Having easy access to lower fares, users are assured of the booking, and the price indicated in the booking will be the final cost.</p>
+            <h3>Secure Transactions and Reliable Confirmations</h3>
+            <p>Online booking of travel requires security. Fareschoices holds reliable payment gateways and safe technology to guard confidential and financial data.</p>
+            <p>Confirmations are made when a booking is made. Proper booking is guaranteed through proper records and effective communication.</p>
+            <h3>Flexible Travel Choices for Every Journey</h3>
+            <p>Needs related to travel are very diverse, and flexibility is a significant factor in decision-making. This platform serves a variety of travelers who are driven by the various fare types and airlines.</p>
+            <p>With affordable options and high-end travelling, passengers can choose services that will best meet their comfort conditions, time schedules, and cost considerations.</p>
+            <h3>Support That Enhances the Booking Experience</h3>
+            <p>Good service to customers is a part of effective travel planning. This platform makes certain that the travelers can receive guidance whenever necessary, either during the booking or after confirmation.</p>
+            <p>Having clear policies and available sources of support and resources can help to make the experience of going to another country a more enjoyable one, as the traveler does not have to think about the administrative part of travel.</p>
+            <h3>Designed for Frequent and First-Time Travelers Alike</h3>
+            <p>Fareschoices targets through acquiring the services of both seasoned travelers and individuals scheduling their travel firsthand. The platform maintains a combination of potent features and user-friendly applications, which make it simple to use by anyone.</p>
+            <p>Booking their routine business trip or a special vacation, travelers will enjoy the benefit of having a dependable, reliable, and efficient booking environment.</p>
+            <p>Fareschoices is a reliable direct reservation app where its main focus is on ease, openness, and traveler trust. It offers fast and convenient prices, safe payments, and a user-friendly interface, making the process of planning the trip a convenient and hassle-free one. Saving time and negative experiences, this platform is used to make the journeys of the traveler easier to plan and book, and every trip can be organized more easily since the initial step of planning.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container FAQ">
+    <div class="row">
+        <div class="column">
+            <h2>FAQs</h2>
+            <div class="grid grid1">
+                <div class="colum">
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>1. What are the services offered at Fareschoices?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>This direct booking provides direct booking of flights featuring a variety of airlines, fares with flexible itineraries, secure payment options, and live availability of all travelers across the globe.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>2. Is this platform a direct booking site?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>Yes, this will enable the traveler to book without any redirections on the site to have a safe, transparent, and simplified process of booking until the final step.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>3. Are the prices displayed on this platform final?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>Every price shown includes the required taxes and fees, which aid in knowing the actual cost of traveling they will be incurring before they can make confirmations without any surprises in the future.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>4. Is it possible to book international flights on this platform?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>It accepts both Domestic and International ticket bookings, which provide options of traveling to any part of the globe and to various airline companies to suit the different travel requirements.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>5. Can one process payment safely on this platform?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>To guarantee the security of user information, the site employs secure payment platforms and reputable gateways to facilitate secure and reliable transactions made by users in the process of making a booking.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="colum">
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>6. Can you find flights quickly using this site?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>With an easy-to-use layout, finding what you need feels smooth. Fast loading keeps up when checking flight options, letting people pick and confirm trips without hassle.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>7. Is this platform flexible in the travel options?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>The travelers have the option of different types of fare, varying schedules, and some flexibility in their choices depending on their comfort levels.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>8. Do confirmations of booking give immediate responses?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>Confirmation of booking takes place immediately after a successful payment, thereby providing travelers with the right information and guaranteeing that they make correct reservations.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>9. Does this platform have customer support?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>There are support resources that cater to travelers with questions regarding booking and give clarity and guidelines during the booking process.</p>
+                        </div>
+                    </div>
+                    <div class="faqs">
+                        <div class="faqhead">
+                            <h3>10. Who can benefit the most from this platform?</h3>
+                            <h3><i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-caret-up"></i></h3>
+                        </div>
+                        <div class="faqdetails">
+                            <p>It is helpful for both frequent and first-time travellers. It is easy to use, transparent in prices, and safe to make reservations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

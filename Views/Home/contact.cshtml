@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "contact";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section metatags{
+
+
+    <title>Contact us 24/7 for assistance - FaresChoices</title>
+    <meta name="description" content="Contact FaresChoices for all your travel needs. Our dedicated support team is available 24/7 to assist with flight bookings, cancellations, and inquiries." />
+    <link rel="canonical" href="https://www.fareschoices.com/contact" />
+    <meta property="og:title" content="Contact us 24/7 for assistance - FaresChoices" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.fareschoices.com/images/logo.png" />
+    <meta name="og:locale" content="en_US" />
+    <meta property="og:site_name" content="fareschoices" />
+    <meta property="og:description" content="Contact FaresChoices for all your travel needs. Our dedicated support team is available 24/7 to assist with flight bookings, cancellations, and inquiries." />
+    <meta property="og:url" content="https://www.fareschoices.com/contact" />
+    <meta name="author" content="fareschoices.com" />
+    <meta name="geo.region" content="US-GA" />
+    <meta name="language" content="English" />
+    <meta name="robots" content="index,follow" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="fareschoices" />
+    <meta name="twitter:title" content="Contact us 24/7 for assistance - FaresChoices" />
+    <meta name="twitter:description" content="Contact FaresChoices for all your travel needs. Our dedicated support team is available 24/7 to assist with flight bookings, cancellations, and inquiries." />
+    <meta name="twitter:image" content="https://www.fareschoices.com/images/logo.png" />
+
+
+
+}
+
+<div class="container BannerBg">
+    <div class="innervootbg">
+        <div class="row">
+            <div class="column">
+                <h1>Contact Us - Fares Choices</h1>
+                @{Html.RenderPartial("~/Views/Shared/_SearchEngine.cshtml");}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container contact">
+    <div class="row grid grid1">
+        <div class="column leftcol">
+            <h2>Send us a message</h2>
+            <form action="">
+                <div class="grid grid1" style="gap: 5px;">
+                    <input type="text" placeholder="Full Name" name="" id="">
+                    <input type="tel" placeholder="Phone Number" name="" id="Tel1">
+                    <input type="email" placeholder="E-mail" name="" id="Email1">
+                    <textarea name="text" id="Textarea1" placeholder="Message"></textarea>
+                </div>
+                <button class="button">Submit</button>
+            </form>
+        </div>
+        <div class="column right">
+            <h2>Contact Information</h2>
+            <div class="grid grid1">
+                <div class="colum">
+                    <h3><i class="fa-solid fa-at"></i></h3>
+                    <p>info@fareschoices.com</p>
+                </div>
+                <div class="colum">
+                    <h3><i class="fa-solid fa-phone"></i></h3>
+                    <p><a href="tel:+18332636016">+1 8332636016</a></p>
+                </div>
+            </div>
+            <div class="colum">
+                <h3><i class="fa-solid fa-location-dot"></i></h3>
+                <p>8330 Commerce Way, APT 408, Miami Lakes 33016, USA</p>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+

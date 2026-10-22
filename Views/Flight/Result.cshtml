@@ -1,0 +1,2081 @@
+﻿@model Viman.Models.FlightsResult
+@using Viman.Models
+
+@{
+    ViewBag.Title = "Search";
+    ViewBag.PageName = "flight";
+    Layout = "~/Views/Shared/_Layoutinner.cshtml";
+}
+
+
+<link href="~/css1/flight_result.css" rel="stylesheet" />
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Trip Type Dropdown
+        const tripTypeBtn = document.getElementById("tripTypeBtn");
+        const tripTypeDropdown = document.getElementById("tripTypeDropdown");
+
+        if (tripTypeBtn && tripTypeDropdown) {
+
+            tripTypeBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                tripTypeDropdown.classList.toggle("open");
+            });
+
+            tripTypeDropdown.addEventListener("click", function (e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Traveller Dropdown
+        const travellerBtn = document.getElementById("travellerBtn");
+        const travellerDropdown = document.getElementById("travellerDropdown");
+
+        if (travellerBtn && travellerDropdown) {
+
+            travellerBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                travellerDropdown.classList.toggle("open");
+            });
+
+            travellerDropdown.addEventListener("click", function (e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener("click", function () {
+
+            if (tripTypeDropdown) {
+                tripTypeDropdown.classList.remove("open");
+            }
+
+            if (travellerDropdown) {
+                travellerDropdown.classList.remove("open");
+            }
+
+        });
+
+    });   
+</script>
+<style>
+
+    .priceFilter .ui-widget-header {
+        background: #526BF1 !important;
+        
+    }
+
+    .filter {
+        width: 100%;
+    }
+    
+    .sky-search-wrap {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .sky-search-btn {
+        width: 100%;
+        height: 62px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+
+
+    @if (@Model.FlightsList != null && @Model.FlightsList.Count > 0)
+    {
+        <div class="sky-header" id="skyHeader">
+
+            <!-- COLLAPSED STATE -->
+            <div class="sky-collapsed" id="skyCollapsed">
+                <div class="sky-pill">
+                    <span class="sky-pill-icon">
+                        <i class="fa fa-search"></i>
+                    </span>
+
+                    <span class="sky-pill-route">
+                        @(Model.FlightsSearch.From.Code) – @(Model.FlightsSearch.To.Code)
+                    </span>
+
+                    <span class="sky-pill-dot">·</span>
+
+                    <span class="sky-pill-meta">
+                        @(Model.FlightsSearch.DepDate.ToString("dd MMM yy"))
+                        @if (Model.FlightsSearch.FlightWay == FlightWay.RoundTrip)
+                        {
+                            <text> - @(Model.FlightsSearch.RetDate.ToString("dd MMM yy"))</text>
+                        }
+                        ·
+                        @Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant)
+                        Traveller(s)
+                    </span>
+                </div>
+
+                <div class="sky-pill-arrow" id="toggleSearch" onclick="expandSearch()">
+                    <i class="fa fa-chevron-down"></i>
+                </div>
+            </div>
+
+            <!-- EXPANDED STATE: full form -->
+            <div class="sky-expanded" id="skyExpanded" style="display:none">
+                <!-- Trip type row -->
+                <div class="sky-type-row">
+                    <div class="sky-type-select" id="tripTypeBtn">
+
+                        <span id="tripTypeLabel">
+                            @((ViewBag.flightWay == "OneWay") ? "→ One Way" : "↩ Round Trip")
+                        </span>
+
+                        <span class="sky-dd-arrow">
+                            <i class="fa fa-chevron-down"></i>
+                        </span>
+
+                        <div class="sky-type-dropdown" id="tripTypeDropdown">
+
+                            <label class="sky-type-opt">
+
+                                <input type="radio"
+                                       name="flight_way"
+                                       id="rdoRoundtrip"
+                                       class="flight_way"
+                                       value="2"
+                                       @((ViewBag.flightWay == "RoundTrip" || ViewBag.flightWay == "") ? "checked" : "") />
+
+                                <span>↩ Round Trip</span>
+
+                            </label>
+
+                            <label class="sky-type-opt">
+
+                                <input type="radio"
+                                       name="flight_way"
+                                       id="rdoOneway"
+                                       class="flight_way"
+                                       value="1"
+                                       @((ViewBag.flightWay == "OneWay") ? "checked" : "") />
+
+                                <span>→ One Way</span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+                    <div class="sky-traveller-select" id="travellerBtn">
+
+                        <!-- Summary -->
+                        <div class="sky-traveller-summary" id="prsn_add">
+
+                            <input type="text" style="background-color: transparent; color: #f3f1ee;"
+                                   id="pass_info"
+                                   name="pass_info"
+                                   readonly
+                                   class="sky-traveller-input ind_inputBox"
+                                   value="@Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant) Traveller(s), Economy" />
+
+                            
+
+                        </div>
+
+                        <!-- Existing dropdown -->
+                        <div class="sky-traveller-dropdown person_dropdown"
+                             id="travellerDropdown">
+
+                            <!-- Adult -->
+                            <div class="sky-tr-row">
+
+                                <div class="sky-tr-info">
+                                    <span class="sky-tr-type">Adults</span>
+                                    <span class="sky-tr-sub">12+ Years</span>
+                                </div>
+
+                                <div class="sky-counter">
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-minus inc_der"
+                                            data-field="adult"
+                                            data-opt="-"></em>
+                                    </a>
+
+                                    <input type="text"
+                                           readonly
+                                           id="flight_adult"
+                                           name="flight_adult"
+                                           class="sky-counter-input inpt_cout_pssngr"
+                                           value="@Model.FlightsSearch.Adult" />
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-plus inc_der"
+                                            data-field="adult"
+                                            data-opt="+"></em>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Child -->
+                            <div class="sky-tr-row">
+
+                                <div class="sky-tr-info">
+                                    <span class="sky-tr-type">Children</span>
+                                    <span class="sky-tr-sub">2-11 Years</span>
+                                </div>
+
+                                <div class="sky-counter">
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-minus inc_der"
+                                            data-field="child"
+                                            data-opt="-"></em>
+                                    </a>
+
+                                    <input type="text"
+                                           readonly
+                                           id="flight_child"
+                                           name="flight_child"
+                                           class="sky-counter-input inpt_cout_pssngr"
+                                           value="@Model.FlightsSearch.Child" />
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-plus inc_der"
+                                            data-field="child"
+                                            data-opt="+"></em>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Infant -->
+                            <div class="sky-tr-row">
+
+                                <div class="sky-tr-info">
+                                    <span class="sky-tr-type">Infants</span>
+                                    <span class="sky-tr-sub">0-2 Years</span>
+                                </div>
+
+                                <div class="sky-counter">
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-minus inc_der"
+                                            data-field="infant"
+                                            data-opt="-"></em>
+                                    </a>
+
+                                    <input type="text"
+                                           readonly
+                                           id="flight_infant"
+                                           name="flight_infant"
+                                           class="sky-counter-input inpt_cout_pssngr"
+                                           value="@Model.FlightsSearch.Infant" />
+
+                                    <a href="javascript:void(0)">
+                                        <em class="fa fa-plus inc_der"
+                                            data-field="infant"
+                                            data-opt="+"></em>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Cabin -->
+                            <div class="sky-cabin-row">
+
+                                <span class="sky-tr-type">
+                                    Cabin Class
+                                </span>
+
+                                <div class="sky-cabin-options">
+
+                                    <label>
+                                        <input type="radio" id="flight_class_4" name="flight_class" value="4" checked />
+                                        Economy
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" id="flight_class_3" name="flight_class" value="3" />
+                                        Premium Economy
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" id="flight_class_2" name="flight_class" value="2" />
+                                        Business
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" id="flight_class_1" name="flight_class" value="1" />
+                                        First
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="sky-tr-footer">
+
+                                <a href="javascript:void(0)"
+                                   id="prsn_done"
+                                   class="sky-tr-done">
+
+                                    Done
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Main form row -->
+                <div class="sky-form-row">
+
+                    <!-- From -->
+                    <div class="sky-field sky-from">
+
+                        <label class="sky-flabel">From</label>
+
+                        <input type="text"
+                               id="flight_from"
+                               name="flight_from"
+                               class="sky-finput autocomplete_from autocomplete_from_new"
+                               value="@(ViewBag.fromName)"
+                               placeholder="Origin"
+                               autocomplete="off" />
+
+                        <div class="sky-swap-btn" title="Swap">
+                            <i class="fa fa-exchange-alt"></i>
+                        </div>
+
+                    </div>
+
+                    <!-- To -->
+                    <div class="sky-field sky-to">
+
+                        <label class="sky-flabel">To</label>
+
+                        <input type="text"
+                               id="flight_to"
+                               name="flight_to"
+                               class="sky-finput autocomplete_to autocomplete_from_to"
+                               value="@(ViewBag.toName)"
+                               placeholder="Destination"
+                               autocomplete="off" />
+
+                    </div>
+
+                    <!-- Departure -->
+
+                    <div class="sky-field sky-depart">
+
+                        <label class="sky-flabel">Depart</label>
+
+                        <input type="text"
+                               id="flight_from_date"
+                               name="flight_from_date"
+                               class="sky-finput"
+                               value="@((ViewBag.depDate!="") ? ViewBag.depDate : DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"))"
+                               placeholder="DD-MM-YYYY"
+                               autocomplete="off"
+                               readonly />
+
+                       
+
+                    </div>
+
+                    <!-- Return -->
+
+                    <div class="sky-field sky-return" id="returnField">
+
+                        <label class="sky-flabel">Return</label>
+
+                        <input type="text"
+                               id="flight_to_date"
+                               name="flight_to_date"
+                               class="sky-finput ind_inputBox"
+                               value="@((ViewBag.retDate!="") ? ViewBag.retDate : DateTime.Now.AddDays(8).ToString("dd-MM-yyyy"))"
+                               placeholder="DD-MM-YYYY"
+                               autocomplete="off"
+                               readonly />
+
+                       
+
+                    </div>
+                    <div class="sky-search-wrap">
+
+                        <a id="flight_submit"
+                           name="flight_submit"
+                           class="sky-search-btn">
+
+                            <span style="color:white">Search</span>
+
+                        </a>
+
+                    </div>
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+        <!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+    <div class="filter">
+        <div class="filterHead">
+            <div class="filterHead-mobile">
+                <span>Filters</span>
+                <a href="javascript:void(0)" class="filterDone">Done</a>
+            </div>
+
+        </div>
+       
+        <div class="filterDiv">
+            <div class="stitle"><h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800;">Stops</h3> </div>
+            <div class="filterCheck" style="margin-top: 2px !important;">
+                <label class="flex" style="gap: 10px;">
+                    <input type="checkbox" checked="checked" class="StopOvr" name="stop_0" id="stop_0" value="0" />
+
+                    <div class="flabel">
+                        Direct<div class="fsub"> from @((Model.StopExtra[0].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[0].TotalCost))</div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="filterCheck" style="margin-top: 2px !important;">
+                <label class="flex" style="gap: 10px;">
+                    <input type="checkbox" checked="checked" class="StopOvr" name="stop_1" id="stop_1" value="1" />
+                    <span class="checkTxt">
+                        <div class="flabel">
+                            1 Stop<div class="fsub"> from @((Model.StopExtra[1].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[1].TotalCost))</div>
+                        </div>
+                    </span>
+                </label>
+            </div>
+            <div class="filterCheck" style="margin-top: 2px !important;">
+                <label for="chk_Direct" class="flex" style="gap: 10px;">
+                    <input type="checkbox" checked="checked" class="StopOvr" name="stop_2" id="stop_2" value="2" />
+                    <span class="checkTxt">
+                        <div class="flabel">
+                            2 Stops <div class="fsub"> from @((Model.StopExtra[2].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[2].TotalCost))</div>
+                        </div>
+                    </span>
+                </label>
+            </div>
+            <h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800!important;">Time Span</h3>
+            <div class="time_panel" style="margin-top:10px">
+                <div class="dep_tim_sun">
+                    <ul>
+                        <li>
+                            <label for="dep_00">
+                                <input class="dep_time" style="display:none" type="checkbox" name="dep_00" id="dep_00" value="0006">
+                                <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_cloud"></div></div>
+                                00-06
+                            </label>
+                        </li>
+                        <li>
+                            <label for="dep_06">
+                                <input class="dep_time" style="display:none" type="checkbox" name="dep_06" id="dep_06" value="0612">
+                                <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_sun"></div></div>
+                                06-12
+                            </label>
+                        </li>
+                        <li>
+                            <label for="dep_12">
+                                <input class="dep_time" style="display:none" type="checkbox" name="dep_12" id="dep_12" value="1218">
+                                <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_heat"></div></div>
+                                12-18
+                            </label>
+                        </li>
+                        <li>
+                            <label for="dep_18">
+                                <input class="dep_time" style="display:none" type="checkbox" name="dep_18" id="dep_18" value="1800">
+                                <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_moon"></div></div>
+                                18-00
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @if (Model.FlightsSearch.FlightWay == FlightWay.RoundTrip)
+            {
+                @*<h3>Return Time <a href="javascript:void(0);" class="ClearReturn_flt">reset filter</a></h3>*@
+                <div class="time_panel" style="margin-top:20px">
+                    <div class="dep_tim_sun">
+                        <ul>
+                            <li>
+                                <label for="ret_00">
+                                    <input class="ret_time" style="display:none" type="checkbox" name="ret_00" id="ret_00" value="0006">
+                                    <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_cloud"></div></div>
+                                    00-06
+                                </label>
+                            </li>
+                            <li>
+                                <label for="ret_06">
+                                    <input class="ret_time" style="display:none" type="checkbox" name="ret_06" id="ret_06" value="0612">
+                                    <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_sun"></div></div>
+                                    06-12
+                                </label>
+                            </li>
+                            <li>
+                                <label for="ret_12">
+                                    <input class="ret_time" style="display:none" type="checkbox" name="ret_12" id="ret_12" value="1218">
+                                    <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_heat"></div></div>
+                                    12-18
+                                </label>
+                            </li>
+                            <li>
+                                <label for="ret_18">
+                                    <input class="ret_time" style="display:none" type="checkbox" name="ret_18" id="ret_18" value="1800">
+                                    <div class="res_sun_box"><div class="res_sun_box_img res_sun_box_img_moon"></div></div>
+                                    18-00
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            }
+
+
+            <h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800!important;">Airlines</h3>
+
+            <div class="airlineSelect">
+                @{ int Ar = 1; }
+                @foreach (FlightsExtra airlineItem in Model.AirlineExtra)
+                {
+
+                    <div class="filterCheck">
+                        <label for="chk_Direct_@(airlineItem.Airline.Code)">
+                            <input type="checkbox" checked="checked" class="airline_flt" name="airline_chk_@(Ar)" id="airline_@(Ar)" value="@(airlineItem.Airline.Code)" data-id="@(Ar)" />
+                            <span class="checkTxt">
+                                <span>@(airlineItem.Airline.Name)</span> &nbsp;&nbsp;&nbsp;
+                                <bdo>$@(Math.Floor(airlineItem.TotalCost))</bdo>
+                            </span>
+                        </label>
+                    </div>
+                    Ar++;
+                }
+                <a href="javascript:void(0);" class="SellectAll_flt">Select all</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a href="javascript:void(0);" class="ClearAll_flt">Clear all</a>
+            </div>
+
+
+            <h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800!important;">Price <a href="javascript:void(0);" class="ClearPrice_flt">reset filter</a></h3>
+            <div class="priceFilter">
+                <div id="slider-range" class="scal_price"></div>
+                <p class="price_range">
+                    <span id="min_price_sp">$ @(Model.MinPrice)</span>
+                    <span id="max_price_sp">$ @(Model.MaxPrice)</span>
+                </p>
+                <input type="text" class="min_max_price" name="min_price" id="min_price" value="@(Model.MinPrice)" style="display:none;" />
+                <input type="text" class="min_max_price" name="max_price" id="max_price" value="@(Model.MaxPrice)" style="display:none;" />
+                <div id="slider-range" class="scal_price"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS COLUMN -->
+    <section class="results-col">
+        <!-- Mobile Filter Toggle -->
+        <div class="filterBtn"><a href="javascript:void(0);" id="filterBtn"><i class="fa fa-filter"></i> Sort & Filter</a></div>
+
+
+        @*<div class="rtabs">
+
+            @{
+                List<FlightsExtra> extras = Model != null ? Model.BarExtra : null;
+                FlightsExtra best = null;
+                FlightsExtra cheapest = null;
+                FlightsExtra shortest = null;
+                if (extras != null)
+                {
+                    best = extras.Find(x => x.ExtraType == "best");
+                    cheapest = extras.Find(x => x.ExtraType == "cheapest");
+                    shortest = extras.Find(x => x.ExtraType == "shortest");
+                }
+            }
+
+
+            <div class="rtab" data-flight-id="@(cheapest != null ? cheapest.FlightId : "")" onclick="openTab(this)">
+                <div class="rtab-lbl">Cheapest</div>
+                <div class="rtab-price">$@(cheapest != null ? cheapest.TotalCost.ToString("F2") : "-")</div>
+
+            </div>
+            <div class="rtab" data-flight-id="@(shortest != null ? shortest.FlightId : "")" onclick="openTab(this)">
+                <div class="rtab-lbl">Recommended</div>
+                <div class="rtab-price">$@(shortest != null ? shortest.TotalCost.ToString("F2") : "-")</div>
+
+            </div>
+
+        </div>*@
+
+        <!-- Cards Container -->
+        <div id="cardsContainer">
+            @if (Model.FlightsSearch.FlightWay == FlightWay.RoundTrip)
+            {
+                int k = 0;
+                foreach (Flights flights in Model.FlightsList)
+                {
+                    int i = 0, j = 0, m = 0, n = 0;
+                    <form method="post" name="flight_frm_@(k)" id="flight_frm_@(k)" action="@Url.Content("~/flight/booking/")">
+                        @foreach (List<FlightsSegment> outboundList in flights.OutboundList)
+                        {
+                            if (flights.InboundList.Count > 0)
+                            {
+                                foreach (List<FlightsSegment> inboundList in flights.InboundList)
+                                {
+                                    k++;
+
+                                    <div class="fcard flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
+                                        <input type="hidden" name="flight_id_@(k)" id="flight_id_@(k)" value="@(flights.FlightId)" />
+
+                                        <div class="card-body">
+
+                                            <input type="hidden" id="hfromflight_@(k)" name="hfromflight_@(k)" value="@(outboundList[0].SegmentRef)" data-stop="@(outboundList.Count - 1)" />
+                                            <div class="airline-name">
+                                                @if (@flights.Airline.Code == "WN")
+                                                {
+                                                    <div class="alogo">
+                                                        <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                    </div>
+                                                    <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
+                                                }
+                                                else if (@flights.Airline != null)
+                                                {
+                                            <div class="alogo">
+                                                <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                            </div>
+
+                                                    <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
+                                                }
+                                            </div>
+
+                                            <div class="flight-main">
+                                                <div class="flight-info">
+                                                    <div class="flight-seg">
+                                                        <div class="seg-times">
+                                                            <input type="hidden" id="hdptTime_@(k)" name="hdptTime_@(k)" value="@(outboundList[0].DepartureDate.ToString("HHmm"))" />
+                                                            <div class="tblk"><div class="t">@(outboundList[0].DepartureDate.ToString("HH:mm"))</div><div class="apt">@(outboundList[0].FromAirport.Code)</div></div>
+                                                            <div class="dur-mid">
+                                                                <div class="dur-line"><div class="dline"></div><span class="dplane">&#9992;</span><div class="dline"></div></div>
+                                                                <div class="dur-label">@(Math.Floor(double.Parse(outboundList[outboundList.Count - 1].TotalTime) / 60)):@(double.Parse(outboundList[outboundList.Count - 1].TotalTime) % 60)H  <span class="stop-badge direct">@((outboundList.Count == 1) ? "Direct" : (outboundList.Count - 1) + " Stop")</span></div>
+                                                            </div>
+                                                            <div class="tblk right"><div class="t">@(outboundList[outboundList.Count - 1].ArrivalDate.ToString("HH:mm"))</div><div class="apt">@(outboundList[outboundList.Count - 1].ToAirport.Code)</div></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="seg2">
+                                                        <input type="hidden" id="htoflight_@(k)" name="htoflight_@(k)" value="@(inboundList[0].SegmentRef)" data-stop="@(inboundList.Count - 1)" />
+                                                        <div class="flight-seg">
+                                                            <div class="seg-times">
+                                                                <div class="tblk"><div class="t">@(inboundList[0].DepartureDate.ToString("HH:mm"))</div><div class="apt">@(inboundList[0].FromAirport.Code)</div></div>
+                                                                <div class="dur-mid">
+                                                                    <div class="dur-line"><div class="dline"></div><span class="dplane">&#9992;</span><div class="dline"></div></div>
+                                                                    <div class="dur-label">@(Math.Floor(double.Parse(inboundList[inboundList.Count - 1].TotalTime) / 60)):@(double.Parse(inboundList[inboundList.Count - 1].TotalTime) % 60)H   <span class="stop-badge direct">@((inboundList.Count == 1) ? "Direct" : (inboundList.Count - 1) + " Stop")</span></div>
+                                                                </div>
+                                                                <div class="tblk right"><div class="t">@(inboundList[inboundList.Count - 1].ArrivalDate.ToString("HH:mm"))</div><div class="apt">@(inboundList[inboundList.Count - 1].ToAirport.Code)</div></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="price-block">
+                                                    <div class="price-left">
+                                                        <div class="deals-lbl"> <a style="flex: 1; margin-block: auto !important; color: #508EEF !important;" href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn"><i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details</a></div>
+                                                        <input type="hidden" name="Prc_@(k)" id="Prc_@(k)" value="@(flights.TotalCost.ToString("0.00"))" />
+                                                        <div class="pbig">$@(flights.TotalCost.ToString("0.00"))</div>
+                                                        <div class="psub">per person, return</div>
+                                                    </div>
+                                                    <a href="javascript:void(0);" class="bookBtn booking_btn" style="background-color: #6D52F1 !important;" data-id="@(k)"><span>Select</span> </a>
+                                                    @*<a href="javascript:void(0);" style="width:fit-content;" class="btn-sel org bookBtn booking_btn" data-id="@(k)"><span>Select</span> </a>*@
+                                                    @*<button class="btn-sel org">Select &#8594;</button>*@
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="fullDetails flightDetail" id="flightDetail_@(k)" data-id="@(k)">
+                                            <div style="text-align:right;"><i class="fa fa-close close_fltDlt" id="close_fltDlt" data-id="@(k)"></i></div>
+                                            <div class="grid grid1">
+                                                <article class="detailsDiv">
+                                                    <div class="detailsHeads">
+                                                        <h3>Outbound</h3>
+                                                    </div>
+                                                    <div class="tripTime">
+                                                        <div class="tripDate">@(outboundList[0].DepartureDate.ToString("ddd dd MMM yy")) - @(outboundList[0].ArrivalDate.ToString("ddd dd MMM yy"))</div>
+                                                        <div class="tripDuration">Duration: @(Math.Floor(double.Parse(outboundList[outboundList.Count - 1].TotalTime) / 60))h @(double.Parse(outboundList[outboundList.Count - 1].TotalTime) % 60)m</div>
+                                                    </div>
+                                                    @{
+                                                        int cntOB = 1;
+                                                        foreach (FlightsSegment outboundArr in outboundList)
+                                                        {
+                                                            double stop_time = 0;
+                                                            if (outboundList.Count > 1)
+                                                            {
+                                                                stop_time = double.Parse(Common.GetTime(outboundList[outboundList.Count - 1].DepartureDate, outboundList[outboundList.Count - 2].ArrivalDate) + "");
+                                                            }
+                                                            <div class="detailsSection">
+                                                                <div class="detailsRow">
+                                                                    <div class="airlinesSection">
+                                                                        <div class="d-flex">
+                                                                            @if (@flights.Airline.Code == "WN")
+                                                                            {
+                                                                                <div class="airLogo">
+                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                                </div>
+                                                                            }
+                                                                            else if (@flights.Airline != null)
+                                                                            {
+                                                                        <div class="airLogo">
+                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                        </div>
+                                                                            }
+                                                                            <div class="airName">@(flights.Airline.Code ?? "")-@(outboundArr.FlightNo) <span>@(outboundArr.Airline.Name)</span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="detailsCity">
+                                                                        <div class="detailsCity-col">
+                                                                            <bdo>@(outboundArr.DepartureDate.ToString("HH:mm")) @(outboundArr.FromAirport.Code)</bdo>
+                                                                            <p>Terminal @(outboundArr.FromTerminal) @(outboundArr.FromAirport.Name)</p>
+                                                                        </div>
+                                                                        <div class="detailsCity-col">
+                                                                            <bdo>@(outboundArr.ArrivalDate.ToString("HH:mm")) @(outboundArr.ToAirport.Code)</bdo>
+                                                                            <p>Terminal @(outboundArr.ToTerminal) @(outboundArr.ToAirport.Name)</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="baggageClass"><span><i class="fa fa-suitcase"></i>@(outboundArr.BaggageAllowance), Cabin: 7 KG</span><span>@outboundArr.CabinClass</span></div>
+                                                                </div>
+                                                                @if (cntOB < outboundList.Count)
+                                                                {
+                                                                    cntOB++;
+                                                                    <div class="stop-container"> <i class="fa fa-hourglass-half"></i>Stop-Over: @(Math.Floor(stop_time / 60))Hrs @(Math.Floor(stop_time % 60))Mins <em>Change of plane required.</em> </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    }
+                                                </article>
+                                                <article class="detailsDiv">
+                                                    <div class="detailsHeads">
+                                                        <h3>Inbound</h3>
+                                                    </div>
+                                                    <div class="tripTime">
+                                                        <div class="tripDate">@(inboundList[0].DepartureDate.ToString("ddd dd MMM yy")) - @(inboundList[0].ArrivalDate.ToString("ddd dd MMM yy"))</div>
+                                                        <div class="tripDuration">Duration: @(Math.Floor(double.Parse(inboundList[inboundList.Count - 1].TotalTime) / 60))h @(double.Parse(inboundList[inboundList.Count - 1].TotalTime) % 60)m</div>
+                                                    </div>
+                                                    @{ int cntIB = 1;
+                                                        foreach (FlightsSegment inboundArr in inboundList)
+                                                        {
+                                                            double stop_time = 0;
+                                                            if (inboundList.Count > 1)
+                                                            {
+                                                                stop_time = double.Parse(Common.GetTime(inboundList[inboundList.Count - 1].DepartureDate, inboundList[inboundList.Count - 2].ArrivalDate) + "");
+                                                            }
+                                                            <div class="detailsSection">
+                                                                <div class="detailsRow">
+                                                                    <div class="airlinesSection">
+                                                                        <div class="d-flex">
+                                                                            @if (@flights.Airline.Code == "WN")
+                                                                            {
+                                                                                <div class="airLogo">
+                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                                </div>
+                                                                            }
+                                                                            else if (@flights.Airline != null)
+                                                                            {
+                                                                        <div class="airLogo">
+                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                        </div>
+                                                                            }
+                                                                            <div class="airName">@(flights.Airline.Code ?? "")-@(inboundArr.FlightNo) <span>@(inboundArr.Airline.Name)</span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="detailsCity">
+                                                                        <div class="detailsCity-col">
+                                                                            <bdo>@(inboundArr.DepartureDate.ToString("HH:mm")) @(inboundArr.FromAirport.Code)</bdo>
+                                                                            <p>Terminal @(inboundArr.FromTerminal) @(inboundArr.FromAirport.Name)</p>
+                                                                        </div>
+                                                                        <div class="detailsCity-col">
+                                                                            <bdo>@(inboundArr.ArrivalDate.ToString("HH:mm")) @(inboundArr.ToAirport.Code)</bdo>
+                                                                            <p>Terminal @(inboundArr.ToTerminal) @(inboundArr.ToAirport.Name)</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="baggageClass">
+                                                                        <span><i class="fa fa-suitcase"></i>@(inboundArr.BaggageAllowance), Cabin: 7 KG</span>
+                                                                        <span>@inboundArr.CabinClass</span>
+                                                                    </div>
+                                                                </div>
+                                                                @if (cntIB < inboundList.Count)
+                                                                {
+                                                                    cntIB++;
+                                                                    <div class="stop-container"> <i class="fa fa-hourglass-half"></i>Stop-Over: @(Math.Floor(stop_time / 60))Hrs.  @(Math.Floor(stop_time % 60))Mins<em>Change of plane required.</em> </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    }
+                                                </article>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+
+                            }
+                        }
+
+                    </form>
+                }
+                <input type="hidden" id="hAllCnt" name="hAllCnt" value="@(k)" />
+            }
+
+            @if (Model.FlightsSearch.FlightWay == FlightWay.OneWay)
+            {
+                int k = 0;
+                foreach (Flights flights in Model.FlightsList)
+                {
+                    int i = 0, j = 0, m = 0, n = 0;
+                    <form method="post" name="flight_frm_@(k)" id="flight_frm_@(k)" action="@Url.Content("~/flight/booking/")">
+                        @foreach (List<FlightsSegment> outboundList in flights.OutboundList)
+                        {
+                            if (flights.OutboundList.Count > 0)
+                            {
+                                k++;
+                               <div class="fcard flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
+                                   <input type="hidden" name="flight_id_@(k)" id="flight_id_@(k)" value="@(flights.FlightId)" />
+
+                                   <div class="card-body">
+
+                                       <input type="hidden" id="hfromflight_@(k)" name="hfromflight_@(k)" value="@(outboundList[0].SegmentRef)" data-stop="@(outboundList.Count - 1)" data-dept="@(outboundList[0].DepartureDate.ToString("HH:mm"))" />
+                                       <div class="airline-name">
+                                           @if (@flights.Airline.Code == "WN")
+                                           {
+                                               <div class="alogo">
+                                                   <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                               </div>
+                                               <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
+                                           }
+                                           else if (@flights.Airline != null)
+                                           {
+                                       <div class="alogo">
+                                           <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                          
+                                       </div>
+
+                                               <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
+                                           }
+                                       </div>
+
+                                       <div class="flight-main">
+                                           <div class="flight-info">
+                                               <div class="flight-seg">
+                                                   <div class="seg-times">
+                                                       <input type="hidden" id="hdptTime_@(k)" name="hdptTime_@(k)" value="@(outboundList[0].DepartureDate.ToString("HHmm"))" />
+                                                       <div class="tblk"><div class="t">@(outboundList[0].DepartureDate.ToString("HH:mm"))</div><div class="apt">@(outboundList[0].FromAirport.Code)</div></div>
+                                                       <div class="dur-mid">
+                                                           <div class="dur-line"><div class="dline"></div><span class="dplane">&#9992;</span><div class="dline"></div></div>
+                                                           <div class="dur-label">@(Math.Floor(double.Parse(outboundList[outboundList.Count - 1].TotalTime) / 60)):@(double.Parse(outboundList[outboundList.Count - 1].TotalTime) % 60)H  <span class="stop-badge direct">@((outboundList.Count == 1) ? "Direct" : (outboundList.Count - 1) + " Stop")</span></div>
+                                                       </div>
+                                                       <div class="tblk right"><div class="t">@(outboundList[outboundList.Count - 1].ArrivalDate.ToString("HH:mm"))</div><div class="apt">@(outboundList[outboundList.Count - 1].ToAirport.Code)</div></div>
+                                                   </div>
+                                               </div>
+
+                                           </div>
+
+                                           <div class="price-block">
+                                               <div class="price-left">
+                                                   <div class="deals-lbl"> <a style="flex: 1; margin-block: auto !important; color: #508EEF !important;" href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn"><i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details</a></div>
+                                                   <input type="hidden" name="Prc_@(k)" id="Prc_@(k)" value="@(flights.TotalCost.ToString("0.00"))" />
+                                                   <div class="pbig">$@(flights.TotalCost.ToString("0.00"))</div>
+                                                   <div class="psub">per person, return</div>
+                                               </div>
+                                               <a href="javascript:void(0);" class="bookBtn booking_btn" style="background-color: #6D52F1 !important;" data-id="@(k)"><span>Select</span> </a>
+                                               @*<a href="javascript:void(0);" style="width:fit-content;" class="btn-sel org bookBtn booking_btn" data-id="@(k)"><span>Select</span> </a>*@
+                                               @*<button class="btn-sel org">Select &#8594;</button>*@
+                                           </div>
+
+                                       </div>
+
+                                   </div>
+                                   <div class="fullDetails flightDetail" id="flightDetail_@(k)" data-id="@(k)">
+                                       <div style="text-align:right;"><i class="fa fa-close close_fltDlt" id="close_fltDlt" data-id="@(k)"></i></div>
+                                       <article class="detailsDiv">
+                                           <div class="detailsHeads">
+                                               <h3>Outbound</h3>
+                                           </div>
+                                           <div class="tripTime">
+                                               <div class="tripDate">@(outboundList[0].DepartureDate.ToString("ddd dd MMM yy"))</div>
+                                               <div class="tripDuration">Duration: @(Math.Floor(double.Parse(outboundList[outboundList.Count - 1].TotalTime) / 60))h @(double.Parse(outboundList[outboundList.Count - 1].TotalTime) % 60)m</div>
+                                           </div>
+                                           @{ int cntOB = 1;
+                                               foreach (FlightsSegment outboundArr in outboundList)
+                                               {
+                                                   double stop_time = 0;
+                                                   if (outboundList.Count > 1)
+                                                   {
+                                                       stop_time = double.Parse(Common.GetTime(outboundList[outboundList.Count - 1].DepartureDate, outboundList[outboundList.Count - 2].ArrivalDate) + "");
+                                                   }
+                                                   <div class="detailsSection">
+                                                       <div class="detailsRow">
+                                                           <div class="airlinesSection">
+                                                               @if (@flights.Airline.Code == "WN")
+                                                               {
+                                                                   <div class="airLogo">
+                                                                       <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                   </div>
+                                                               }
+                                                               else if (@flights.Airline != null)
+                                                               {
+                                                           <div class="airLogo">
+                                                               <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                           </div>
+                                                               }
+                                                               <div class="airName">@(outboundArr.Airline.Code)-@(outboundArr.FlightNo) <span>@(outboundArr.Airline.Name)</span></div>
+                                                           </div>
+                                                           <div class="detailsCity">
+                                                               <div class="detailsCity-col">
+                                                                   <bdo>@(outboundArr.DepartureDate.ToString("HH:mm")) @(outboundArr.FromAirport.Code)</bdo>
+                                                                   <p>@(outboundArr.DepartureDate.ToString("ddMMM"))  Terminal @(outboundArr.FromTerminal) @(outboundArr.FromAirport.Name)</p>
+                                                               </div>
+                                                               <div class="detailsCity-col">
+                                                                   <bdo>@(outboundArr.ArrivalDate.ToString("HH:mm")) @(outboundArr.ToAirport.Code)</bdo>
+                                                                   <p>@(outboundArr.ArrivalDate.ToString("ddMMM")) Terminal @(outboundArr.ToTerminal) @(outboundArr.ToAirport.Name)</p>
+                                                               </div>
+                                                           </div>
+                                                           <div class="baggageClass">
+                                                               <span><i class="fa fa-suitcase"></i>@(outboundArr.BaggageAllowance), Cabin: 7 KG</span>
+                                                               <span>@outboundArr.CabinClass</span>
+                                                           </div>
+                                                       </div>
+                                                       @if (cntOB < outboundList.Count)
+                                                       {
+                                                           cntOB++;
+                                                           <div class="stop-container"> <i class="fa fa-hourglass-half"></i>Stop-Over: @(Math.Floor(stop_time / 60))Hrs @(Math.Floor(stop_time % 60))Mins <em>Change of plane required.</em> </div>
+                                                       }
+                                                   </div>
+                                               }
+                                           }
+                                       </article>
+                                   </div>
+                               </div>
+                            }
+                        }
+                    </form>
+                }
+                <input type="hidden" id="hAllCnt" name="hAllCnt" value="@(k)" />
+            }
+        </div>
+
+
+    </section>
+
+    <!-- PROMO COLUMN (Desktop only) -->
+    <aside class="promo-col">
+
+
+        <!-- Why Book With Us Cards -->
+        <div class="why-book-card">
+            <div class="why-book-header">Why book with us?</div>
+            <div class="why-book-item">
+                <div class="why-book-icon">🔒</div>
+                <div class="why-book-content">
+                    <div class="why-book-title">100% Secure Booking</div>
+                    <div class="why-book-desc">SSL encrypted payments. Your data is always safe.</div>
+                </div>
+            </div>
+            <div class="why-book-item">
+                <div class="why-book-icon">📞</div>
+                <div class="why-book-content">
+                    <div class="why-book-title">24/7 Customer Support</div>
+                    <div class="why-book-desc">Our travel experts are always a call away.</div>
+                </div>
+            </div>
+            <div class="why-book-item why-book-item--last">
+                <div class="why-book-icon">💲</div>
+                <div class="why-book-content">
+                    <div class="why-book-title">No Hidden Charges</div>
+                    <div class="why-book-desc">The price you see is the price you pay, always.</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+        <!-- ═══════════════ MOBILE FILTER DRAWER ═══════════════ -->
+        <div class="filter-overlay" id="filterOverlay"></div>
+        <div class="filter-drawer" id="filterDrawer">
+            <div class="filter-drawer-header">
+                <span class="filter-drawer-title">Filters</span>
+                <button class="filter-close">&#10005;</button>
+            </div>
+            <div style="padding:0 16px 16px">
+                <!-- Stops -->
+                <div class="ssec" style="border-bottom:1px solid var(--off-white)">
+                    <div class="stitle">Stops</div>
+                    <div class="frow" data-filter="stop" data-val="direct">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">Direct<div class="fsub">from $320</div></div>
+                    </div>
+                    <div class="frow" data-filter="stop" data-val="1stop">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">1 stop<div class="fsub">from $410</div></div>
+                    </div>
+                </div>
+                <!-- Airlines -->
+                <div class="ssec" style="border-bottom:1px solid var(--off-white)">
+                    <div class="stitle">Airlines</div>
+                    <div class="fctrls">
+                        <button class="fctrl-btn">Select all</button>
+                        <button class="fctrl-btn">Clear all</button>
+                    </div>
+                    <div class="frow" data-filter="airline" data-val="IndiGo">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">Delta Air Lines<div class="fsub">from $320</div></div>
+                    </div>
+                    <div class="frow" data-filter="airline" data-val="Air India Express">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">United Airlines<div class="fsub">from $350</div></div>
+                    </div>
+                    <div class="frow" data-filter="airline" data-val="SpiceJet">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">American Airlines<div class="fsub">from $390</div></div>
+                    </div>
+                    <div class="frow" data-filter="airline" data-val="Akasa Air">
+                        <div class="fcb on">&#10003;</div>
+                        <div class="flabel">Southwest Airlines<div class="fsub">from $370</div></div>
+                    </div>
+                </div>
+                <!-- Price -->
+                <div class="ssec" style="border-bottom:1px solid var(--off-white)">
+                    <div class="stitle">Price per person</div>
+                    <div class="rval" id="priceValMobile">Up to $800</div>
+                    <div class="rslider-wrap">
+                        <input type="range" class="rslider" min="200" max="800" value="800">
+                        <div class="rlabels"><span>$200</span><span>$800</span></div>
+                    </div>
+                </div>
+            </div>
+            <button class="filter-apply-btn">Show Results</button>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <!-- ═══════════════ FLIGHT DETAIL POPUP ═══════════════ -->
+       
+
+        <!-- ═══════════════ airfareslookup CALENDAR MODAL ═══════════════ -->
+        <div class="cal-overlay" id="calOverlay"></div>
+        <div class="cal-modal" id="calModal">
+            <!-- Selection Summary Bar -->
+            <div class="cal-summary-bar" id="calSummaryBar">
+                <div class="cal-summary-item">
+                    <span class="cal-summary-label">Depart</span>
+                    <span class="cal-summary-date" id="summaryDepart">Select date</span>
+                </div>
+                <span class="cal-summary-arrow">→</span>
+                <div class="cal-summary-item">
+                    <span class="cal-summary-label">Return</span>
+                    <span class="cal-summary-date" id="summaryReturn">Select date</span>
+                </div>
+            </div>
+
+            <div class="cal-tabs">
+                <button class="cal-tab active" id="tabSpecific">Specific dates</button>
+                <button class="cal-tab" id="tabFlexible">Flexible dates</button>
+                <button class="cal-close-btn" title="Close">✕</button>
+            </div>
+            <div class="cal-body" id="calBody">
+                <button class="cal-nav cal-prev">&#8249;</button>
+                <button class="cal-nav cal-next">&#8250;</button>
+                <div class="cal-months-wrap" id="calMonthsWrap">
+                    <!-- months rendered by JS -->
+                </div>
+            </div>
+            <div class="cal-footer">
+                <button class="cal-clear">Clear dates</button>
+                <button class="cal-apply" id="calApplyBtn">Apply</button>
+            </div>
+        </div>
+        @*<script src="./js/flight_result.js"></script>*@
+
+
+
+
+    }
+
+
+@section scripts{
+
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+        var checkingradio = '@ViewBag.flightWay';
+if (checkingradio === "OneWay")
+    {
+        $("#flight_to_date").hide();
+        $("#flight_to_dateCal").hide();
+    }
+else
+{
+    $("#flight_to_date").show();
+    $("#flight_to_dateCal").show();
+}
+            $("#filterBtn").click(function () {
+                $("body").addClass("filterBody");
+                var newHeight = $("body").height();
+                $(".filterDiv").height(newHeight - 73);
+                $(".filter").addClass("filterOpen");
+            });
+            $(".filterDone").on("click", function () {
+                $("body").removeClass("filterBody");
+                $(".filter").removeClass("filterOpen");
+            });
+
+            $("#slider-rangeee").slider({
+                range: true,
+                min: 939,
+                max: 10536,
+                values: [939, 10536],
+                slide: function (event, ui) {
+                    $("#min_price_sp").html("$" + ui.values[0]);
+                    $("#max_price_sp").html("$" + ui.values[1]);
+                    $("#min_price").val(ui.values[0]);
+                    $("#max_price").val(ui.values[1]);
+                },
+                stop: function (event, ui) {
+                    changeFilter();
+                }
+            });
+
+            $(".detailBtn").click(function () {
+                debugger;
+                var flight_id = $(this).attr("data-id");
+                $("#flightDetail_" + flight_id).slideToggle();
+            });
+            $(".close_fltDlt").click(function () {
+                var flight_id = $(this).attr("data-id");
+                $("#flightDetail_" + flight_id).slideUp();
+            });
+
+            $(document).on('mouseup', function (e) {
+                var popup = $('.flightDetail');
+                var isVisible = popup.is(':visible');
+                // If visible and click is outside
+                if (isVisible && !popup.is(e.target) && popup.has(e.target).length === 0) {
+                    popup.slideUp(250);
+                    $('.fullDetails').fadeOut(200);
+                }
+            });
+
+            // When clicking the X mark
+            $(document).on('click', '.flightDetail .fa-xmark', function () {
+                $('.flightDetail').slideUp(250);
+                $('.fullDetails').fadeOut(200);
+            });
+
+            $(".flight_way").click(function () {
+                var flight_id = $(this).attr("id");
+                if (flight_id == "rdoOneway") {
+                    $("#flight_to_date").hide();
+                    $("#flight_to_dateCal").hide();
+                }
+                else {
+                    $("#flight_to_date").show();
+                    $("#flight_to_dateCal").show();
+                }
+            });
+        });
+
+
+        $(".booking_btn").click(function () {
+            debugger;
+            var flight_opt = $(this).data("id");
+            var flightId = $("#flight_id_" + flight_opt).val();
+            var outId = $("#hfromflight_" + flight_opt).val();
+            var inIdTxt = "";
+            if ($('input[name=flight_way]:checked').val() == "2") {
+                var inId = $("#htoflight_" + flight_opt).val();
+                inIdTxt = inId.replace("+", "%2B");
+            }
+
+            var str = "/flight/prebooking?flightId=" + (flightId.replace("+", "%2B")) + "&outId=" + (outId.replace("+", "%2B")) + "&inId=" + inIdTxt;
+            window.location = str;
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var selectFrom = false;
+            var selectTo = false;
+
+            $('#flight_from').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/api/getairport",
+                        dataType: "json",
+                        data: {
+                            pickUpLocation: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.Code,
+                                    label: (item.Code + "-" + item.Name + ", " + item.CityName)
+                                }
+                            }));
+                        }
+                    })
+                },
+                open: function (event, ui) { selectFrom = true; },
+                select: function (event, ui) {
+                    $(this).val(ui.item.label);
+                    selectFrom = false;
+                    return false;
+                },
+                close: function (event, ui) {
+                    selectFrom = false;
+                },
+                minLength: 3,
+                autoFocus: true
+            }).blur(function () {
+                if (selectFrom) {
+                    $("#flight_from").val($('ul.ui-autocomplete li:first a').text());
+                }
+            }).focus(function () {
+                $(this).autocomplete("search");
+            });
+
+            $("#flight_to").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/api/getairport",
+                        dataType: "json",
+                        data: {
+                            pickUpLocation: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.Code,
+                                    label: (item.Code + "-" + item.Name + ", " + item.CityName)
+                                }
+                            }));
+                        }
+                    })
+                },
+                open: function (event, ui) {
+                    selectTo = true;
+                },
+                select: function (event, ui) {
+                    $(this).val(ui.item.label);
+                    selectTo = false;
+                    return false;
+                },
+                close: function (event, ui) {
+                    selectTo = false;
+                },
+                minLength: 3,
+                autoFocus: true
+            }).blur(function () {
+                if (selectTo) {
+                    $("#flight_to").val($('ul.ui-autocomplete li:first a').text());
+                }
+            }).focus(function () {
+                $(this).autocomplete("search");
+            });
+
+            $("input[name=flight_class]").change(function () {
+                getPassenger();
+            });
+            $("#prsn_add").click(function () {
+                $("#prsn_popup").slideDown("slow");
+            });
+            $("#prsn_done").click(function () {
+                $("#prsn_popup").slideUp("slow");
+            });
+            $('body').click(function () {
+                $("#prsn_popup").slideUp("slow");
+            });
+            $('.prp_popup').click(function (e) {
+                e.stopPropagation();
+            });
+        });
+
+        function getPassenger() {
+            var chk_cls = $('input[name=flight_class]:checked').val();
+
+            if (chk_cls == "1") {
+                str += ", First";
+            }
+            else if (chk_cls == "2") {
+                str += ", Business";
+            }
+            else if (chk_cls == "3") {
+                str += ", Premimum Economy";
+            }
+            else {
+                str += ", Economy";
+            }
+            $("#pass_info").val(str);
+        }
+
+        function addNightToDate(fromD, toD, noD) {
+            var s_date_arr = $('#' + fromD).val().split("-");
+            var dat = new Date(s_date_arr[2] + "-" + s_date_arr[1] + "-" + s_date_arr[0]);
+            dat.addDays(noD);
+            var c_day = (dat.getDate().toString().length == 1) ? "0" + dat.getDate() : dat.getDate();
+            var c_month = ((dat.getMonth() + 1).toString().length == 1) ? "0" + (dat.getMonth() + 1) : (dat.getMonth() + 1);
+            $('#' + toD).val(c_day + "-" + c_month + "-" + dat.getFullYear());
+        }
+
+        $( function() {
+            $("#slider-range").slider({
+                range: true,
+                min: @(Model.MinPrice),
+                max: @(Model.MaxPrice),
+                values: [ @(Model.MinPrice), @(Model.MaxPrice) ],
+                slide: function( event, ui ) {
+                    $("#min_price_sp").html("$" + ui.values[0]);
+                    $("#max_price_sp").html("$" + ui.values[1]);
+                    $("#min_price").val(ui.values[0]);
+                    $("#max_price").val(ui.values[1]);
+                },
+                stop: function (event, ui) {
+                    changeFilter();
+                }
+            });
+            $("#min_price_sp").html("$" + $("#slider-range").slider("values", 0));
+            $("#max_price_sp").html("$" + $("#slider-range").slider("values", 1));
+            $("#min_price").val($("#slider-range").slider("values", 0));
+            $("#max_price").val($("#slider-range").slider("values", 1));
+            $(".dep_time").change(function(e){
+                if ($(this).prop('checked')==true)
+                    $(this).parent("label").addClass("active");
+                else
+                    $(this).parent("label").removeClass("active");
+                changeFilter();
+            });
+            $(".ret_time").change(function(e){
+                if ($(this).prop('checked')==true)
+                    $(this).parent("label").addClass("active");
+                else
+                    $(this).parent("label").removeClass("active");
+                changeFilter();
+            });
+
+            $(".bar_clear_filter").click(function(e){
+                e.stopPropagation();
+                $(".bar_clear_filter").hide();
+                clearFilter();
+            });
+
+            $(".bar_filter").click(function(e){
+                var dt_opt = $(this).data("option");
+                var dt_id = $(this).data("id");
+                $(".bar_filter").removeClass("active");
+                $(this).addClass("active");
+                $(".bar_clear_filter").hide();
+                $(this).children(".fair_comp").children(".fair_comp_grp").children("div").show();
+                if(dt_opt=="cheapest")
+                {
+                    var main_loop = $('.flight_main[data-id="'+dt_id+'"]').data("loop");
+                    $('div[data-id="'+dt_id+'"]').show();
+                    $(".option_out_"+main_loop).show().removeClass("active");
+                    $(".option_out_"+main_loop+":first").addClass("active");
+                    $(".option_out_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_out_"+main_loop).hide();
+                    $(".radio_detail_out_"+main_loop+":first").show();
+                    $(".option_in_"+main_loop).show().removeClass("active");
+                    $(".option_in_"+main_loop+":first").addClass("active");
+                    $(".option_in_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_in_"+main_loop).hide();
+                    $(".radio_detail_in_"+main_loop+":first").show();
+                }
+                else if(dt_opt=="quickest")
+                {
+                    var main_loop = $('.flight_main[data-id="'+dt_id+'"]').data("loop");
+                    $('div[data-id="'+dt_id+'"]').show();
+                    $(".option_out_"+main_loop).show().removeClass("active");
+                    $(".option_out_"+main_loop+":first").addClass("active");
+                    $(".option_out_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_out_"+main_loop).hide();
+                    $(".radio_detail_out_"+main_loop+":first").show();
+                    $(".option_in_"+main_loop).show().removeClass("active");
+                    $(".option_in_"+main_loop+":first").addClass("active");
+                    $(".option_in_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_in_"+main_loop).hide();
+                    $(".radio_detail_in_"+main_loop+":first").show();
+                }
+                else if(dt_opt=="best")
+                {
+                    var main_loop = $('.flight_main[data-id="'+dt_id+'"]').data("loop");
+                    $('div[data-id="'+dt_id+'"]').show();
+                    $(".option_out_"+main_loop).show().removeClass("active");
+                    $(".option_out_"+main_loop+":first").addClass("active");
+                    $(".option_out_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_out_"+main_loop).hide();
+                    $(".radio_detail_out_"+main_loop+":first").show();
+                    $(".option_in_"+main_loop).show().removeClass("active");
+                    $(".option_in_"+main_loop+":first").addClass("active");
+                    $(".option_in_"+main_loop+":first").children("ul").children("li").children("input").attr('checked',true);
+                    $(".radio_detail_in_"+main_loop).hide();
+                    $(".radio_detail_in_"+main_loop+":first").show();
+                }
+            });
+
+            $(".outbound_main").click(function(e){
+                var option_id = $(this).data("option");
+                $(".option_out_"+option_id).removeClass("active");
+                $(this).addClass("active");
+                var radio_detail_id = $(this).data("detail-id");
+                $(".radio_detail_out_"+option_id).removeClass("active");
+                $("#"+radio_detail_id).addClass("active");
+            });
+
+            $(".inbound_main").click(function(e){
+                var option_id = $(this).data("option");
+                $(".option_in_"+option_id).removeClass("active");
+                $(this).addClass("active");
+                var radio_detail_id = $(this).data("detail-id");
+                $(".radio_detail_in_"+option_id).removeClass("active");
+                $("#"+radio_detail_id).addClass("active");
+            });
+
+            $("#btn_serch_show, #btn_serch_showMb").click(function () {
+                $(".srch_box_srchPge_modify").slideToggle("slow");
+            });
+
+            $(".view_detail_btn").click(function () {
+                var flight_id = $(this).attr("data-id");
+                var slide_flag = $(this).children("bdo").html();
+                if(slide_flag=="Flight Detail")
+                {
+                    $("#flight_detail_"+flight_id).slideDown();
+                    $(this).children("bdo").html("Hide Detail");
+                }
+                else
+                {
+                    $("#flight_detail_"+flight_id).slideUp();
+                    $(this).children("bdo").html("Flight Detail");
+                }
+            });
+            $(".close_detail_btn").click(function () {
+                var flight_id = $(this).attr("data-id");
+                $("#flight_detail_" + flight_id).slideUp();
+            });
+
+            $("#vw_dtl_btnONE, .cls_vwBtnONE").click(function () {
+                $(".vw_dtl_mn_boxONE").slideToggle("slow");
+            });
+
+            $(".deal_btn").click(function(){
+                var flight_opt = $(this).data("id");
+                var flightId = $("#flight_id_"+flight_opt).val();
+                var outId = $("input[name=radio_out_"+flight_opt+"]:checked").val();
+                var inId = $("input[name=radio_in_"+flight_opt+"]:checked").val();
+                var str = "@(ViewBag.WebsiteURL + "flight/enquiry?")flightId="+flightId+"&outId="+outId+"&inId="+inId;
+                window.location = str;
+            });
+
+            $("#mobile_show_filter").click(function(){
+                $("html, body").animate({ scrollTop: "142px" });
+                $(".lef_main_pnl_mobileHiDE").slideDown();
+                $(this).hide();
+                $("#mobile_done_filter_2").show();
+            });
+            $("#mobile_hide_filter").click(function(){
+                $(".clear_filter").click();
+                $(".lef_main_pnl_mobileHiDE").slideUp();
+                $("html, body").animate({ scrollTop: "145px" });
+            });
+            $("#mobile_done_filter_2").click(function(){
+                $(".lef_main_pnl_mobileHiDE").slideUp();
+                $(this).hide();
+                $("#mobile_show_filter").show();
+            });
+            $("#mobile_done_filter").click(function(){
+                $(".lef_main_pnl_mobileHiDE").slideUp();
+                $("html, body").animate({ scrollTop: "145px" });
+                $("#mobile_done_filter_2").hide();
+                $("#mobile_show_filter").show();
+            });
+
+            $(".clear_filter").click(function(){
+                $("#mobile_done_filter_2").hide();
+                $("#mobile_show_filter").show();
+                clearFilter();
+            });
+        });
+
+        function clearFilter()
+        {
+            $("#sup_filter_div").fadeIn("fast", function(){
+                $(".bar_filter").removeClass("active");
+                $(".bar_clear_filter").hide();
+                $(".airline_clear_filter").hide();
+                $(".owl-item").removeClass("airactive");
+                $(".flt_stops").prop('checked',false);
+                $(".dep_time").prop('checked',false);
+                $(".dep_time").parent("label").removeClass("active");
+                $(".ret_time").prop('checked',false);
+                $(".ret_time").parent("label").removeClass("active");
+                $(".airline_flt").prop('checked',false);
+
+                var options = $("#slider-range").slider( 'option' );
+                $("#slider-range").slider( 'values', [ options.min, options.max ] );
+                $("#min_price_sp").html("$" + options.min);
+                $("#max_price_sp").html("$" + options.max);
+                $("#min_price").val(options.min);
+                $("#max_price").val(options.max);
+                $(".flight_main").each(function(i){
+                    var main_loop = $(this).data("loop");
+                    $(".option_out_"+main_loop).show().removeClass("active");
+                    $(".option_out_"+main_loop+":first").addClass("active");
+                    $(".option_out_"+main_loop+":first").children("ul").children("li").children("input").prop('checked',true);
+                    $(".radio_detail_out_"+main_loop).hide();
+                    $(".radio_detail_out_"+main_loop+":first").show();
+                    $(".option_in_"+main_loop).show().removeClass("active");
+                    $(".option_in_"+main_loop+":first").addClass("active");
+                    $(".option_in_"+main_loop+":first").children("ul").children("li").children("input").prop('checked',true);
+                    $(".radio_detail_in_"+main_loop).hide();
+                    $(".radio_detail_in_"+main_loop+":first").show();
+                    $(this).show();
+                });
+                $(".main_no_found").hide();
+                $("#sup_filter_div").hide();
+            });
+        }
+
+        var flightData = '@(Html.Raw(ViewBag.FilterData))';
+
+        $("#stop_0").click(function () {
+            FilterCheck1();
+        });
+        $("#stop_1").click(function () {
+            FilterCheck2();
+        });
+        $("#stop_2").click(function () {
+            FilterCheck3();
+        });
+
+        function FilterCheck1() {
+            var fway = $('input[name=flight_way]:checked').val();
+            var stop_0 = $('input[name="stop_0"]:checked').val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                arr = $(".flight_mainVal" + i).data("airline");
+                var stop = 0;
+                stop = $(".flight_mainVal" + i).data("stop");
+                if (typeof stop_0 == "undefined" && stop == "0") {
+
+                    $(".flight_mainVal" + i).hide();
+                }
+                if (stop_0 == "0" && stop == "0") {
+
+                    $(".flight_mainVal" + i).show();
+                }
+            }
+        }
+        function FilterCheck2() {
+            var fway = $('input[name=flight_way]:checked').val();
+            var stop_1 = $('input[name="stop_1"]:checked').val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                arr = $(".flight_mainVal" + i).data("airline");
+                var stop = 0;
+                stop = $(".flight_mainVal" + i).data("stop");
+                if (typeof stop_1 == "undefined" && stop == "1") {
+                    $(".flight_mainVal" + i).hide();
+                }
+                if (stop_1 == "1" && stop == "1") {
+                    $(".flight_mainVal" + i).show();
+                }
+            }
+        }
+        function FilterCheck3() {
+            var fway = $('input[name=flight_way]:checked').val();
+            var stop_3 = $('input[name="stop_3"]:checked').val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                arr = $(".flight_mainVal" + i).data("airline");
+                var stop = 0;
+                stop = $(".flight_mainVal" + i).data("stop");
+                if (typeof stop_3 == "undefined" && stop == "2") {
+                    $(".flight_mainVal" + i).hide();
+                }
+                if (stop_3 == "2" && stop == "2") {
+                    $(".flight_mainVal" + i).show();
+                }
+            }
+        }
+
+        $(".airline_flt").click(function () {
+            var flight_id = $(this).attr("data-id");
+            var ArrLine = $("#airline_"+flight_id).val();
+            var name = "airline_chk_" + flight_id;
+            var Flarr = $('input[name='+ name +']:checked').val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                arr = $(".flight_mainVal" + i).data("airline");
+                var stop = 0;
+                if (typeof Flarr == "undefined" && arr == ArrLine) {
+                    $(".flight_mainVal" + i).hide();
+                }
+                if (Flarr == ArrLine && arr == ArrLine) {
+                    $(".flight_mainVal" + i).show();
+                }
+            }
+        });
+
+        $("#dep_00").click(function () {
+            var fld_time = $("#dep_00").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hdptTime_" + i).val());
+                if (time >= 0 && time <= 600) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+        $("#dep_06").click(function () {
+            var fld_time = $("#dep_06").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hdptTime_" + i).val());
+                if (time >= 601 && time <= 1200) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+        $("#dep_12").click(function () {
+            var fld_time = $("#dep_12").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hdptTime_" + i).val());
+                if (time >= 1201 && time <= 1800) {
+
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+        $("#dep_18").click(function () {
+            var fld_time = $("#dep_18").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hdptTime_" + i).val());
+                if (time >= 1801 && time <= 2359) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+        $("#ret_00").click(function () {
+            var fld_time = $("#ret_00").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hretTime_" + i).val());
+                if (time >= 0 && time <= 600) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+        $("#ret_06").click(function () {
+            var fld_time = $("#ret_06").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hretTime_" + i).val());
+                if (time >= 601 && time <= 1200) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+        $("#ret_12").click(function () {
+            var fld_time = $("#ret_12").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hretTime_" + i).val());
+                if (time >= 1201 && time <= 1800) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+        $("#ret_18").click(function () {
+            var fld_time = $("#ret_18").val();
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var time = parseInt($("#hretTime_" + i).val());
+                if (time >= 1801 && time <= 2359) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        });
+
+            $(".ClearDeparture_flt").click(function () {
+                $('.dep_time').prop('checked', false);
+                $('.dep_time').parent("label").removeClass("active");
+                changeFilter();
+            });
+
+            function changeFilter() {
+                var fway = $('input[name=flight_way]:checked').val();
+
+                // Get Stop Filters
+                var stop_0 = $('input[name="stop_0"]:checked').val();
+                var stop_1 = $('input[name="stop_1"]:checked').val();
+                var stop_2 = $('input[name="stop_2"]:checked').val();
+
+                // Get Departure Time Filters
+                var dep_00 = $('input[name="dep_00"]:checked').val();
+                var dep_06 = $('input[name="dep_06"]:checked').val();
+                var dep_12 = $('input[name="dep_12"]:checked').val();
+                var dep_18 = $('input[name="dep_18"]:checked').val();
+
+                // Get Return Time Filters
+                var ret_00 = $('input[name="ret_00"]:checked').val();
+                var ret_06 = $('input[name="ret_06"]:checked').val();
+                var ret_12 = $('input[name="ret_12"]:checked').val();
+                var ret_18 = $('input[name="ret_18"]:checked').val();
+
+                // Get Min/Max Price
+                var min_p = parseFloat($("#min_price").val());
+                var max_p = parseFloat($("#max_price").val());
+
+                var AllCnt = $("#hAllCnt").val();
+                for (var i = 1; i <= AllCnt; i++) {
+                    var $flight = $(".flight_mainVal" + i);
+
+                    // Flight Data
+                    var flightStop = $flight.data("stop");
+                    var flightPrice = parseFloat($flight.data("price"));
+                    var flightDepTime = parseInt($("#hdptTime_" + i).val());
+                    var flightRetTime = parseInt($("#hretTime_" + i).val()); // May be undefined/NaN for one-way
+
+                    var airlineCode = $flight.data("airline");
+                    var isAirlineChecked = true;
+                    if($('.airline_flt').length > 0) {
+                         // If any airline filter exists
+                         var $airlineChk = $('.airline_flt[value="' + airlineCode + '"]');
+                         if($airlineChk.length > 0 && !$airlineChk.is(':checked')) {
+                             isAirlineChecked = false;
+                         }
+                         // Also check "new_airline_flt" if that's a thing (lines 386)
+                         var $newAirlineChk = $('.new_airline_flt[data-airline="' + airlineCode + '"]');
+                         if($newAirlineChk.length > 0 && !$newAirlineChk.is(':checked')) {
+                             isAirlineChecked = false;
+                         }
+                    }
+
+                    // Combined Check
+                    var show = true;
+
+                    // 1. Stops
+                    if (!checkStop(stop_0, stop_1, stop_2, flightStop)) show = false;
+
+                    // 2. Dep Time
+                    if (show && !checkDep(dep_00, dep_06, dep_12, dep_18, flightDepTime)) show = false;
+
+                    // 3. Ret Time (Only if roundtrip and ret filters exist/checked)
+                    // checkDep function logic can be reused for return time if we pass return time vars
+                    if (show && fway == "2") {
+                         // Reuse checkDep logic for return times
+                         if (!checkDep(ret_00, ret_06, ret_12, ret_18, flightRetTime)) show = false;
+                    }
+
+                    // 4. Price
+                    if (show) {
+                        if (flightPrice < min_p || flightPrice > max_p) show = false;
+                    }
+
+                    // 5. Airline
+                    if (show && !isAirlineChecked) show = false;
+
+
+                    if (show) {
+                        $flight.show();
+                    } else {
+                        $flight.hide();
+                    }
+                }
+            }
+
+        $(".ClearReturn_flt").click(function () {
+            // Uncheck all return time checkboxes
+            $(".ret_time").prop('checked', false);
+            // Remove active class from labels
+            $(".ret_time").parent("label").removeClass("active");
+            // Trigger filter update
+            changeFilter();
+        });
+
+        $(".ClearPrice_flt").click(function () {
+            var min = $("#slider-range").slider("option", "min");
+            var max = $("#slider-range").slider("option", "max");
+            $("#slider-range").slider("values", 0, min);
+            $("#slider-range").slider("values", 1, max);
+            $("#min_price").val(min);
+            $("#max_price").val(max);
+            $("#min_price_sp").html("$" + min);
+            $("#max_price_sp").html("$" + max);
+            changeFilter();
+        });
+
+        $(".ClearAll_flt").click(function () {
+            var AllCnt = $("#hAllCnt").val();
+            $('.airline_flt').prop('checked', false);
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                    $(".flight_mainVal" + i).hide();
+            }
+        });
+
+        $(".SellectAll_flt").click(function () {
+            var AllCnt = $("#hAllCnt").val();
+            $('.airline_flt').prop('checked', true);
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                $(".flight_mainVal" + i).show();
+            }
+        });
+
+        $(".ClearStopover_flt").click(function () {
+            var AllCnt = $("#hAllCnt").val();
+            $('.StopOvr').prop('checked', false);
+            for (var i = 1; i <= AllCnt; i++) {
+                var arr = "";
+                $(".flight_mainVal" + i).hide();
+            }
+        });
+
+        $(".resetBtn").click(function (e) {
+            e.preventDefault();
+            $(".StopOvr").prop('checked', true);
+            $(".airline_flt").prop('checked', true);
+            $(".dep_time").prop('checked', false);
+            $(".dep_time").parent("label").removeClass("active");
+            $(".ret_time").prop('checked', false);
+            $(".ret_time").parent("label").removeClass("active");
+
+            var min = $("#slider-range").slider("option", "min");
+            var max = $("#slider-range").slider("option", "max");
+            $("#slider-range").slider("values", 0, min);
+            $("#slider-range").slider("values", 1, max);
+            $("#min_price").val(min);
+            $("#max_price").val(max);
+            $("#min_price_sp").html("$" + min);
+            $("#max_price_sp").html("$" + max);
+
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                $(".flight_mainVal" + i).show();
+            }
+        });
+
+        function rangeFilter(min, max) {
+            var AllCnt = $("#hAllCnt").val();
+            for (var i = 1; i <= AllCnt; i++) {
+                var prc = parseInt($("#Prc_" + i).val());
+                if (prc >= min && prc <= max) {
+                    $(".flight_mainVal" + i).show();
+                }
+                else {
+                    $(".flight_mainVal" + i).hide();
+                }
+            }
+        }
+
+        function checkDep(dep_00, dep_06, dep_12, dep_18, fld_time)
+        {
+            if(typeof dep_00 === "undefined" && typeof dep_06 === "undefined" && typeof dep_12 === "undefined" && typeof dep_18 === "undefined")
+            {
+                return true;
+            }
+            else
+            {
+                if(typeof dep_00 !== "undefined" && fld_time>=0 && fld_time<=600)
+                    return true;
+                else if(typeof dep_06 !== "undefined" && fld_time>=601 && fld_time<=1200)
+                    return true;
+                else if(typeof dep_12 !== "undefined" && fld_time>=1201 && fld_time<=1800)
+                    return true;
+                else if(typeof dep_18 !== "undefined" && fld_time>=1801 && fld_time<=2359)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        function checkStop(stop_0, stop_1, stop_2, fld_stop)
+        {
+            if(typeof stop_0 === "undefined" && typeof stop_1 === "undefined" && typeof stop_2 === "undefined")
+            {
+                return true;
+            }
+            else
+            {
+                if(typeof stop_0 !== "undefined" && fld_stop==0)
+                    return true;
+                else if(typeof stop_1 !== "undefined" && fld_stop==1)
+                    return true;
+                else if(typeof stop_2 !== "undefined" && fld_stop>=2)
+                    return true;
+                else
+                    return false;
+            }
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        function openTab(tabBtn) {
+            //debuger;
+            $('.tab-btn').removeClass('active');
+            $(tabBtn).addClass('active');
+            const selectedFlightId = $(tabBtn).data('flight-id');
+            if (!selectedFlightId) return;
+            const $panel = $('.tab-panel.active');
+            if ($panel.length === 0) return;
+            const $flights = $panel.find('.flight_main');
+            if ($flights.length === 0) return;
+            const $selected = $flights.filter('[data-id="' + selectedFlightId + '"]');
+            if ($selected.length === 0) return;
+            const $others = $flights.not($selected);
+            const sorted = $others.sort(function (a, b) {
+                const priceA = parseFloat($(a).attr('data-price')) || 0;
+                const priceB = parseFloat($(b).attr('data-price')) || 0;
+                return priceA - priceB;
+            });
+            $selected.prependTo($panel);
+            sorted.each(function () {
+                $(this).appendTo($panel);
+            });
+            $selected.css({
+                border: "2px solid #007bff",
+                backgroundColor: "#f0f8ff"
+            });
+            setTimeout(() => {
+                $selected.css({ border: "", backgroundColor: "" });
+            }, 1500);
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function filterNewAirlines(clickedCheckbox) {
+                if (!clickedCheckbox.prop('checked')) {
+                    var airlineCode = clickedCheckbox.data('airline');
+                    $('.flight_main').hide();
+                    $('.flight_main').each(function () {
+                        if ($(this).data('airline') === airlineCode) {
+                            $(this).show();
+                        }
+                    });
+                } else {
+                    $('.flight_main').show();
+                }
+            }
+            $('.new_airline_flt').on('change', function () {
+                filterNewAirlines($(this));
+            });
+            $('#selectAllNewAirline').click(function () {
+                $('.new_airline_flt').prop('checked', true);
+                $('.flight_main').show();
+            });
+            $('#clearAllNewAirline').click(function () {
+                $('.new_airline_flt').prop('checked', false);
+                $('.flight_main').hide();
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.new_airline_flt').on('change', function () {
+                var airlineCode = $(this).data('airline');
+                $('.CustomCol label').removeClass('selected');
+                if (!$(this).prop('checked')) {
+                    $(this).siblings('label').addClass('selected');
+                    $('.flight_main').hide();
+                    $('.flight_main').each(function () {
+                        if ($(this).data('airline') === airlineCode) {
+                            $(this).show();
+                        }
+                    });
+                    $('.new_airline_flt').not(this).prop('checked', true);
+                } else {
+                    $('.flight_main').show();
+                    $('.new_airline_flt').prop('checked', true);
+                }
+            });
+
+        });
+    </script>
+
+
+    <script>
+        function expandSearch() {
+
+            $("#skyExpanded").slideToggle(200);
+
+            $("#toggleSearch i").toggleClass("fa-chevron-down fa-chevron-up");
+        }
+    </script>
+
+    <script src="/scripts/lodash.min.js"></script>
+    <script src="/scripts/fuse.min.js"></script>
+    <script src="/scripts/airports.js"></script>   
+    <script src="~/scripts/index.js"></script>
+    <script src="~/css/file.js"></script>
+    <script src="~/css/slide.js"></script>
+   
+
+}
+
+

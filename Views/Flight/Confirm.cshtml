@@ -1,0 +1,543 @@
+﻿@model Viman.Models.FlightsBooking
+@using Viman.Models
+@{
+    ViewBag.Title = "Confirm";
+    Layout = "~/Views/Shared/_Layoutinner.cshtml";
+    ViewBag.WebsiteURL = Common.WebsiteURL;
+    ViewBag.StaticURL = Common.StaticURL;
+    ViewBag.Currency = Common.Currency;
+
+    FlightsSearch flightSearch = ViewBag.flightSearch;
+    Flights flights = ViewBag.flights;
+    DateTime dt1 = DateTime.Now.Date;
+}
+
+<link href="~/css1/thankyou.css" rel="stylesheet" />
+
+<div class="main">
+
+    <!-- ── SUCCESS HERO ── -->
+    <div class="success-hero">
+        <div class="check-anim"><img src="~/images/Web-Check-In.png" alt="Confirmed" style="width:44px;height:44px;object-fit:contain;"></div>
+        <div class="success-title">Booking Confirmed!</div>
+        <div class="success-sub">
+            Your flight has been booked successfully. 
+        </div>
+
+        <div class="pnr-badge">
+            <div>
+                <div class="pnr-label">Booking Reference / PNR</div>
+                <div class="pnr-value" id="pnrDisplay">@(Model.BookingId)</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ── E-TICKET ── -->
+    <div class="ticket-card">
+        <div class="ticket-header">
+
+            <div>
+
+                <div class="ticket-header-title">
+                    <img src="~/images/Book-Another-Flight.png"
+                         alt="Ticket"
+                         style="width:14px;height:14px;vertical-align:middle;margin-right:6px;filter:brightness(0) invert(1);">
+
+                    E-Ticket Summary
+                </div>
+
+                <div class="ticket-header-sub">
+
+                    @(Model.FlightsSearch.FlightWay == FlightWay.RoundTrip ? "Round Trip" : "One Way")
+                    ·
+                    @Model.Flights.Outbound[0].CabinClass
+                    ·
+                    @Model.Flights.FlightFare.Adult Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : "")
+
+                    @if (Model.Flights.FlightFare.Child > 0)
+                    {
+                        <text> · @Model.Flights.FlightFare.Child Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
+                    }
+
+                    @if (Model.Flights.FlightFare.Infant > 0)
+                    {
+                        <text> · @Model.Flights.FlightFare.Infant Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <img src="@("https://fareschoices.com/Content/airline/fit/" + Model.Flights.Outbound[0].Airline.Code + ".gif")" alt="@Model.Flights.Outbound[0].Airline.Name"
+                 style="width:60px;height:auto;object-fit:contain;border-radius:6px;background:#fff;padding:4px;"> />
+
+
+        </div>
+
+        @{
+            // Outbound
+            var obFirst = flights.Outbound.First();
+            var obLast = flights.Outbound.Last();
+
+            string obDuration = Math.Floor(double.Parse(obLast.TotalTime) / 60) + "h " +
+                                (double.Parse(obLast.TotalTime) % 60) + "m";
+
+            string obStops = flights.Outbound.Count > 1
+                ? (flights.Outbound.Count - 1) + " Stop(s)"
+                : "Non-stop";
+
+            // Inbound
+            FlightsSegment ibFirst = null;
+            FlightsSegment ibLast = null;
+            string ibDuration = "";
+            string ibStops = "";
+
+            if (flightSearch.FlightWay == FlightWay.RoundTrip)
+            {
+                ibFirst = flights.Inbound.First();
+                ibLast = flights.Inbound.Last();
+
+                ibDuration = Math.Floor(double.Parse(ibLast.TotalTime) / 60) + "h " +
+                             (double.Parse(ibLast.TotalTime) % 60) + "m";
+
+                ibStops = flights.Inbound.Count > 1
+                    ? (flights.Inbound.Count - 1) + " Stop(s)"
+                    : "Non-stop";
+            }
+        }
+
+        <div class="ticket-body">
+
+            <!-- ================= OUTBOUND ================= -->
+
+            <div class="leg-label">
+                <span class="leg-dot"></span>Outbound
+            </div>
+
+            <div class="flight-seg">
+
+                <!-- Departure -->
+                <div>
+                    <div class="seg-airport">@obFirst.FromAirport.Code</div>
+                    <div class="seg-city">@obFirst.FromAirport.Name</div>
+                    <div class="seg-time">@obFirst.DepartureDate.ToString("hh:mm tt")</div>
+                    <div class="seg-date">@obFirst.DepartureDate.ToString("ddd, MMM dd, yyyy")</div>
+                </div>
+
+                <!-- Center -->
+                <div class="seg-mid">
+
+                    <div class="seg-duration">@obDuration</div>
+
+                    <div class="seg-line">
+                        <div class="dot"></div>
+                        <div class="line"></div>
+
+                        <div class="plane-icon">
+                            <img src="~/images/Book-Another-Flight.png"
+                                 style="width:14px;height:14px;" />
+                        </div>
+
+                        <div class="line"></div>
+                        <div class="dot"></div>
+                    </div>
+
+                    <div class="seg-stops">@obStops</div>
+
+                    <div class="seg-airline">
+                        @obFirst.Airline.Name · @obFirst.Airline.Code-@obFirst.FlightNo
+                    </div>
+
+                </div>
+
+                <!-- Arrival -->
+                <div class="seg-right">
+                    <div class="seg-airport">@obLast.ToAirport.Code</div>
+                    <div class="seg-city">@obLast.ToAirport.Name</div>
+                    <div class="seg-time">@obLast.ArrivalDate.ToString("hh:mm tt")</div>
+                    <div class="seg-date">@obLast.ArrivalDate.ToString("ddd, MMM dd, yyyy")</div>
+                </div>
+
+            </div>
+
+            @if (flights.Outbound.Count > 1)
+            {
+                for (int i = 0; i < flights.Outbound.Count - 1; i++)
+                {
+                    var stopTime = double.Parse(Common.GetTime(
+                        flights.Outbound[i + 1].DepartureDate,
+                        flights.Outbound[i].ArrivalDate).ToString());
+
+                    <div class="fltTime-row">
+                        Stop Over :
+                        @(Math.Floor(stopTime / 60))h
+                        @(Math.Floor(stopTime % 60))m
+                        <span class="stopRed">CHANGE OF PLANE REQUIRED</span>
+                    </div>
+                }
+            }
+
+            @if (flightSearch.FlightWay == FlightWay.RoundTrip)
+            {
+                <div class="ticket-divider">
+                    <div class="td-line"></div>
+                    <div class="td-circle">✂</div>
+                    <div class="td-line"></div>
+                </div>
+
+                <!-- ================= RETURN ================= -->
+
+                <div class="leg-label">
+                    <span class="leg-dot"></span>Return
+                </div>
+
+                <div class="flight-seg">
+
+                    <!-- Departure -->
+                    <div>
+                        <div class="seg-airport">@ibFirst.FromAirport.Code</div>
+                        <div class="seg-city">@ibFirst.FromAirport.Name</div>
+                        <div class="seg-time">@ibFirst.DepartureDate.ToString("hh:mm tt")</div>
+                        <div class="seg-date">@ibFirst.DepartureDate.ToString("ddd, MMM dd, yyyy")</div>
+                    </div>
+
+                    <!-- Center -->
+                    <div class="seg-mid">
+
+                        <div class="seg-duration">@ibDuration</div>
+
+                        <div class="seg-line">
+                            <div class="dot"></div>
+                            <div class="line"></div>
+
+                            <div class="plane-icon">
+                                <img src="~/images/Book-Another-Flight.png"
+                                     style="width:14px;height:14px;" />
+                            </div>
+
+                            <div class="line"></div>
+                            <div class="dot"></div>
+                        </div>
+
+                        <div class="seg-stops">@ibStops</div>
+
+                        <div class="seg-airline">
+                            @ibFirst.Airline.Name · @ibFirst.Airline.Code-@ibFirst.FlightNo
+                        </div>
+
+                    </div>
+
+                    <!-- Arrival -->
+                    <div class="seg-right">
+                        <div class="seg-airport">@ibLast.ToAirport.Code</div>
+                        <div class="seg-city">@ibLast.ToAirport.Name</div>
+                        <div class="seg-time">@ibLast.ArrivalDate.ToString("hh:mm tt")</div>
+                        <div class="seg-date">@ibLast.ArrivalDate.ToString("ddd, MMM dd, yyyy")</div>
+                    </div>
+
+                </div>
+
+                if (flights.Inbound.Count > 1)
+                {
+                    for (int i = 0; i < flights.Inbound.Count - 1; i++)
+                    {
+                        var stopTime = double.Parse(Common.GetTime(
+                            flights.Inbound[i + 1].DepartureDate,
+                            flights.Inbound[i].ArrivalDate).ToString());
+
+                        <div class="fltTime-row">
+                            Stop Over :
+                            @(Math.Floor(stopTime / 60))h
+                            @(Math.Floor(stopTime % 60))m
+                            <span class="stopRed">CHANGE OF PLANE REQUIRED</span>
+                        </div>
+                    }
+                }
+            }
+
+        </div>
+
+        <!-- Ticket Info Grid -->
+        <!-- Passengers -->
+        <div style="padding:16px 24px 4px;font-size:12px;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.8px;">Passengers</div>
+        <div class="pax-list">
+
+            @foreach (PassengerDetail paxItem in Model.PassengerDetail)
+            {
+                var initials = "";
+
+                if (!string.IsNullOrEmpty(paxItem.FirstName))
+                {
+                    initials += paxItem.FirstName.Substring(0, 1).ToUpper();
+                }
+
+                if (!string.IsNullOrEmpty(paxItem.LastName))
+                {
+                    initials += paxItem.LastName.Substring(0, 1).ToUpper();
+                }
+
+                string paxType = "Adult";
+
+                string passengerType = paxItem.PassengerType.ToString().ToUpper();
+
+                if (passengerType == "CHD" || passengerType == "CHILD")
+                {
+                    paxType = "Child";
+                }
+                else if (passengerType == "INF" || passengerType == "INFANT")
+                {
+                    paxType = "Infant";
+                }
+
+                string gender = paxItem.Gender == "1" ? "Male" : "Female";
+
+                <div class="pax-row">
+
+                    <div class="pax-avatar">
+                        @initials
+                    </div>
+
+                    <div>
+                        <div class="pax-name">
+                            @paxItem.FirstName @paxItem.LastName
+                        </div>
+
+                        <div class="pax-detail">
+                            @paxType · @gender · DOB:
+                            @paxItem.DOB.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+
+                    <div class="pax-badge">
+                        Confirmed
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- ── PRICE SUMMARY ── -->
+    @if (Session["com"] != null && Session["com"] != "")
+    {
+        <div class="price-card">
+
+            <div class="price-card-header">
+                <img src="~/images/Payment-Summary.png"
+                     style="width:18px;height:18px;vertical-align:middle;">
+                Payment Summary
+            </div>
+
+            <div class="price-rows">
+
+                <div class="price-row">
+                    <span>Base Fare (@Model.Flights.FlightFare.Adult Adult(s))</span>
+                    <span>
+                        @(ViewBag.Currency)
+                        @((((Model.Flights.FlightFare.AdultFare +
+                        Model.Flights.FlightFare.AdultTax +
+                        Model.Flights.FlightFare.AdultMarkup) *
+                        Model.Flights.FlightFare.Adult) - 12).ToString("0.00"))
+                    </span>
+                </div>
+
+                @if (Model.Flights.FlightFare.Child > 0)
+                {
+                    <div class="price-row">
+                        <span>Child Fare (@Model.Flights.FlightFare.Child)</span>
+                        <span>
+                            @(ViewBag.Currency)
+                            @((((Model.Flights.FlightFare.ChildFare +
+                            Model.Flights.FlightFare.ChildTax +
+                            Model.Flights.FlightFare.ChildMarkup) *
+                            Model.Flights.FlightFare.Child) - 12).ToString("0.00"))
+                        </span>
+                    </div>
+                }
+
+                @if (Model.Flights.FlightFare.Infant > 0)
+                {
+                    <div class="price-row">
+                        <span>Infant Fare (@Model.Flights.FlightFare.Infant)</span>
+                        <span>
+                            @(ViewBag.Currency)
+                            @((((Model.Flights.FlightFare.InfantFare +
+                            Model.Flights.FlightFare.InfantTax +
+                            Model.Flights.FlightFare.InfantMarkup) *
+                            Model.Flights.FlightFare.Infant) - 12).ToString("0.00"))
+                        </span>
+                    </div>
+                }
+
+                <div class="price-row">
+                    <span>Taxes &amp; Surcharges</span>
+                    <span>Included</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Convenience Fee</span>
+                    <span>
+                        @(ViewBag.Currency)
+                        @(((Model.Flights.FlightFare.Adult +
+                        Model.Flights.FlightFare.Child +
+                        Model.Flights.FlightFare.Infant)).ToString("0.00"))
+                    </span>
+                </div>
+
+                <div class="price-row total">
+                    <span>Total Paid</span>
+                    <span>
+                        @(ViewBag.Currency)
+                        @(((Model.Flights.FlightFare.GrandTotal +
+                        (Model.Flights.FlightFare.Adult +
+                         Model.Flights.FlightFare.Child +
+                         Model.Flights.FlightFare.Infant)) - 12).ToString("0.00"))
+                    </span>
+                </div>
+
+                <div class="price-row paid" style="padding-top:8px">
+                    <span>
+                        <img src="~/images/Check-Your-Email.png"
+                             style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">
+                        Payment received successfully
+                    </span>
+                    <span>PAID</span>
+                </div>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="price-card">
+
+            <div class="price-card-header">
+                <img src="~/images/Payment-Summary.png"
+                     style="width:18px;height:18px;vertical-align:middle;">
+                Payment Summary
+            </div>
+
+            <div class="price-rows">
+
+                <div class="price-row">
+                    <span>Base Fare (@Model.Flights.FlightFare.Adult Adult(s))</span>
+                    <span>
+                        @(ViewBag.Currency)
+                        @(((Model.Flights.FlightFare.AdultFare +
+                        Model.Flights.FlightFare.AdultTax +
+                        Model.Flights.FlightFare.AdultMarkup) *
+                        Model.Flights.FlightFare.Adult).ToString("0.00"))
+                    </span>
+                </div>
+
+                @if (Model.Flights.FlightFare.Child > 0)
+                {
+                    <div class="price-row">
+                        <span>Child Fare (@Model.Flights.FlightFare.Child)</span>
+                        <span>
+                            @(ViewBag.Currency)
+                            @(((Model.Flights.FlightFare.ChildFare +
+                            Model.Flights.FlightFare.ChildTax +
+                            Model.Flights.FlightFare.ChildMarkup) *
+                            Model.Flights.FlightFare.Child).ToString("0.00"))
+                        </span>
+                    </div>
+                }
+
+                @if (Model.Flights.FlightFare.Infant > 0)
+                {
+                    <div class="price-row">
+                        <span>Infant Fare (@Model.Flights.FlightFare.Infant)</span>
+                        <span>
+                            @(ViewBag.Currency)
+                            @(((Model.Flights.FlightFare.InfantFare +
+                            Model.Flights.FlightFare.InfantTax +
+                            Model.Flights.FlightFare.InfantMarkup) *
+                            Model.Flights.FlightFare.Infant).ToString("0.00"))
+                        </span>
+                    </div>
+                }
+
+                <div class="price-row">
+                    <span>Taxes &amp; Surcharges</span>
+                    <span>Included</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Convenience Fee</span>
+                    <span>0.00</span>
+                </div>
+
+                <div class="price-row total">
+                    <span>Total Paid</span>
+                    <span>
+                        @(ViewBag.Currency)
+                        @((Model.Flights.FlightFare.GrandTotal).ToString("0.00"))
+                    </span>
+                </div>
+
+                @*<div class="price-row paid" style="padding-top:8px">
+                    <span>
+                        <img src="~/images/Check-Your-Email.png"
+                             style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">
+                        Payment received successfully
+                    </span>
+                    <span>PAID</span>
+                </div>*@
+
+            </div>   
+
+        </div>
+    }
+
+    <!-- ── WHAT'S NEXT ── -->
+    <div class="next-steps">
+        <h5><img src="~/images/Print-Save-Ticket.png" alt="next" style="width:16px;height:16px;vertical-align:middle;"> What's Next?</h5>
+        <div class="step-list">
+           
+            <div class="step-item">
+                <div class="step-icon"><img src="~/images/Web-Check-In.png" alt="Check-In" style="width:20px;height:20px;object-fit:contain;"></div>
+                <div>
+                    <div class="step-text-title">Web Check-In</div>
+                    <div class="step-text-sub">Online check-in opens 48 hours before departure. Visit Airlines website to select your seat.</div>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-icon"><img src="~/images/Baggage-Allowance.png" alt="Baggage" style="width:20px;height:20px;object-fit:contain;"></div>
+                <div>
+                    <div class="step-text-title">Baggage Allowance</div>
+                    <div class="step-text-sub">15 kg checked baggage + 7 kg cabin baggage per passenger. Arrive at airport 2 hours before.</div>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-icon"><img src="~/images/Carry-Your-ID.png" alt="ID" style="width:20px;height:20px;object-fit:contain;"></div>
+                <div>
+                    <div class="step-text-title">Carry Your ID</div>
+                    <div class="step-text-sub">Carry a valid government-issued photo ID (passport, Aadhar, or driving license) at the airport.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ACTION BUTTONS ── -->
+    <div class="action-btns">
+        <button class="btn-primary" onclick="window.print()">
+            <img src="~/images/Print-Save-Ticket.png" alt="Print" style="width:16px;height:16px;filter:brightness(0) invert(1);"> Print / Save Ticket
+        </button>
+        <button class="btn-secondary" onclick="window.location.href='https://www.fareschoices.com/'">
+            <img src="~/images/Book-Another-Flight.png" alt="Flight" style="width:16px;height:16px;"> Book Another Flight
+        </button>
+        <button class="btn-secondary">
+            <a href="tel:+18332636016">
+                <img src="~/images/Need-Help.png" alt="Help" style="width:16px;height:16px;"> Need Help?
+                </a>
+        </button>
+    </div>
+
+</div>
+

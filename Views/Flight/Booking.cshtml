@@ -1,0 +1,1931 @@
+﻿@model Viman.Models.FlightsBooking
+@using Viman.Models
+@{
+    ViewBag.Title = "Booking";
+    Layout = "~/Views/Shared/_Layoutinner.cshtml";
+    ViewBag.WebsiteURL = Common.WebsiteURL;
+    ViewBag.StaticURL = Common.StaticURL;
+    ViewBag.Currency = Common.Currency;
+    FlightsSearch flightSearch = ViewBag.flightSearch;
+    Flights flights = ViewBag.flights;
+
+    int mm = 0, nn = 0, pass = 0;
+
+    <style>
+        .form-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.08);
+        }
+
+            .form-card h5 {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 6px;
+            }
+
+        .section-sub {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .passenger-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .ptab {
+            border: none;
+            background: #f3f4f8;
+            color: #333;
+            padding: 10px 22px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: .3s;
+            font-weight: 500;
+        }
+
+            .ptab:hover {
+                background: #0d6efd;
+                color: #fff;
+            }
+
+            .ptab.active {
+                background: #0d6efd;
+                color: #fff;
+            }
+
+        .passenger-panel {
+            display: none;
+        }
+
+            .passenger-panel.active {
+                display: block;
+            }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+            .form-row.three {
+                grid-template-columns: repeat(3,1fr);
+            }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .form-group label {
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 7px;
+            }
+
+        .form-control,
+        .form-select {
+            height: 48px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 15px;
+            transition: .3s;
+        }
+
+            .form-control:focus,
+            .form-select:focus {
+                border-color: #0d6efd;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+            }
+
+        .gender-box {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            height: 48px;
+        }
+
+            .gender-box label {
+                margin: 0;
+                font-weight: 500;
+            }
+
+            .gender-box input {
+                margin-right: 6px;
+            }
+
+        @@media(max-width:992px) {
+
+            .form-row {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @@media(max-width:600px) {
+
+            .form-row,
+            .form-row.three {
+                grid-template-columns: 1fr;
+            }
+
+            .passenger-tabs {
+                overflow: auto;
+                white-space: nowrap;
+            }
+
+            .ptab {
+                flex: none;
+            }
+        }
+    </style>
+
+
+    double fare = 0;
+    string flightid = "";
+    foreach (FlightsSegment outboundArr in flights.Outbound)
+    {
+
+        fare = Convert.ToDouble(flights.TotalCost.ToString("0.00"));
+
+        flightid = flights.FlightId;
+
+    }
+    if (flightSearch.FlightWay == FlightWay.RoundTrip)
+    {
+
+        foreach (FlightsSegment inboundArr in flights.Inbound)
+        {
+
+            fare = Convert.ToDouble(flights.TotalCost.ToString("0.00"));
+
+            flightid = flights.FlightId;
+
+        }
+
+
+    }
+
+
+
+}
+
+<link href="~/css1/checkout.css" rel="stylesheet" />
+
+<!-- ═══════════════ CHECKOUT PROGRESS ═══════════════ -->
+<div class="checkout-header">
+    <div class="checkout-header-inner">
+        @*<a href="flight_result.html" class="back-to-results">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Back to results
+            </a>*@
+        <div class="steps">
+            <div class="step done">
+                <div class="step-num">✓</div>
+                <span class="step-label">Search</span>
+            </div>
+            <span class="step-sep">›</span>
+            <div class="step done">
+                <div class="step-num">✓</div>
+                <span class="step-label">Review</span>
+            </div>
+            <span class="step-sep">›</span>
+            <div class="step active">
+                <div class="step-num">3</div>
+                <span class="step-label">Checkout</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<div class="page">
+    <div class="listing">
+        <form method="post" id="booking_frm" name="booking_frm" action="@Url.Content("~/Flight/Payment")">
+            <input type="hidden" id="hsearchId" name="hsearchId" value="@(Model.FlightsSearch.SearchId)" />
+            <div class="main">
+                <!-- ===== LEFT: Forms ===== -->
+                <div id="leftCol">
+
+                    <!-- ─── Passenger Details ─── -->
+                    <div class="form-card">
+                        <h5>
+                            <span class="icon">
+                                <img src="~/images/Passenger-Details.png"
+                                     style="width:18px;height:18px;object-fit:contain;">
+                            </span>
+                            Passenger Details
+                        </h5>
+
+                        <p class="section-sub">
+                            Name exactly as it appears on passport or government ID.
+                        </p>
+
+                        <!-- Passenger Tabs -->
+                        <div class="passenger-tabs">
+                            @for (int i = 1; i <= Model.FlightsSearch.Adult; i++)
+                            {
+                                <button type="button"
+                                        class="ptab @(i==1?"active":"")"
+                                        onclick="switchPassenger(@(i-1))">
+                                    Adult @i
+                                </button>
+                            }
+
+                            @for (int i = 1; i <= Model.FlightsSearch.Child; i++)
+                            {
+                                <button type="button"
+                                        class="ptab"
+                                        onclick="switchPassenger(@(Model.FlightsSearch.Adult+i-1))">
+                                    Child @i
+                                </button>
+                            }
+
+                            @for (int i = 1; i <= Model.FlightsSearch.Infant; i++)
+                            {
+                                <button type="button"
+                                        class="ptab"
+                                        onclick="switchPassenger(@(Model.FlightsSearch.Adult+Model.FlightsSearch.Child+i-1))">
+                                    Infant @i
+                                </button>
+                            }
+                        </div>
+
+                        @{
+                            int adultIndex = 0;
+                        }
+
+                        @for (int aa = 1; aa <= Model.FlightsSearch.Adult; aa++)
+                        {
+                            pass++;
+
+                            <div class="passenger-panel @(aa==1 ? "active" : "")"
+                                 id="pax@(adultIndex)">
+
+                                <!-- Name -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Title *</label>
+
+                                        <select class="form-select"
+                                                id="title_@(pass)"
+                                                name="title_@(pass)">
+
+                                            <option value="MR">Mr</option>
+                                            <option value="MRS">Mrs</option>
+                                            <option value="MISS">Miss</option>
+                                            <option value="MASTER">Master</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>First Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="fname_@(pass)"
+                                               name="fname_@(pass)"
+                                               placeholder="First Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Last Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="lname_@(pass)"
+                                               name="lname_@(pass)"
+                                               placeholder="Last Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                </div>
+
+                                <!-- DOB -->
+
+                                <div class="form-row three">
+
+                                    <div class="form-group">
+
+                                        <label>Birth Day</label>
+
+                                        <select class="form-select"
+                                                id="pDay_@(pass)"
+                                                name="pDay_@(pass)">
+
+                                            <option value="">Day</option>
+
+                                            @for (int d = 1; d <= 31; d++)
+                                            {
+                                                <option value="@d.ToString("00")">
+                                                    @d.ToString("00")
+                                                </option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Month</label>
+
+                                        <select class="form-select"
+                                                id="pMonth_@(pass)"
+                                                name="pMonth_@(pass)">
+
+                                            <option value="">Month</option>
+
+                                            <option value="01">Jan</option>
+                                            <option value="02">Feb</option>
+                                            <option value="03">Mar</option>
+                                            <option value="04">Apr</option>
+                                            <option value="05">May</option>
+                                            <option value="06">Jun</option>
+                                            <option value="07">Jul</option>
+                                            <option value="08">Aug</option>
+                                            <option value="09">Sep</option>
+                                            <option value="10">Oct</option>
+                                            <option value="11">Nov</option>
+                                            <option value="12">Dec</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Year</label>
+
+                                        <select class="form-select"
+                                                id="pYear_@(pass)"
+                                                name="pYear_@(pass)">
+
+                                            @for (int y = DateTime.Now.Year - 12; y >= 1924; y--)
+                                            {
+                                                <option value="@y">@y</option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Gender -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Gender *</label>
+
+                                        <div class="gender-box">
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_male_@(pass)"
+                                                       value="1"
+                                                       checked />
+
+                                                Male
+
+                                            </label>
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_female_@(pass)"
+                                                       value="2" />
+
+                                                Female
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            adultIndex++;
+                        }
+
+                        @for (int aa = 1; aa <= Model.FlightsSearch.Child; aa++)
+                        {
+                            pass++;
+
+                            <div class="passenger-panel"
+                                 id="pax@(Model.FlightsSearch.Adult + aa - 1)">
+
+                                <!-- Name -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Title *</label>
+
+                                        <select class="form-select"
+                                                id="title_@(pass)"
+                                                name="title_@(pass)">
+
+                                            <option value="MASTER">Master</option>
+                                            <option value="MISS">Miss</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>First Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="fname_@(pass)"
+                                               name="fname_@(pass)"
+                                               placeholder="First Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Last Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="lname_@(pass)"
+                                               name="lname_@(pass)"
+                                               placeholder="Last Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                </div>
+
+                                <!-- DOB -->
+
+                                <div class="form-row three">
+
+                                    <div class="form-group">
+
+                                        <label>Birth Day</label>
+
+                                        <select class="form-select"
+                                                id="pDay_@(pass)"
+                                                name="pDay_@(pass)">
+
+                                            <option value="">Day</option>
+
+                                            @for (int d = 1; d <= 31; d++)
+                                            {
+                                                <option value="@d.ToString("00")">
+                                                    @d.ToString("00")
+                                                </option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Month</label>
+
+                                        <select class="form-select"
+                                                id="pMonth_@(pass)"
+                                                name="pMonth_@(pass)">
+
+                                            <option value="">Month</option>
+
+                                            <option value="01">Jan</option>
+                                            <option value="02">Feb</option>
+                                            <option value="03">Mar</option>
+                                            <option value="04">Apr</option>
+                                            <option value="05">May</option>
+                                            <option value="06">Jun</option>
+                                            <option value="07">Jul</option>
+                                            <option value="08">Aug</option>
+                                            <option value="09">Sep</option>
+                                            <option value="10">Oct</option>
+                                            <option value="11">Nov</option>
+                                            <option value="12">Dec</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Year</label>
+
+                                        <select class="form-select"
+                                                id="pYear_@(pass)"
+                                                name="pYear_@(pass)">
+
+                                            @for (int y = DateTime.Now.Year - 12; y >= 1924; y--)
+                                            {
+                                                <option value="@y">@y</option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Gender -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Gender *</label>
+
+                                        <div class="gender-box">
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_male_@(pass)"
+                                                       value="1"
+                                                       checked />
+
+                                                Male
+
+                                            </label>
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_female_@(pass)"
+                                                       value="2" />
+
+                                                Female
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            adultIndex++;
+                        }
+
+                        @for (int aa = 1; aa <= Model.FlightsSearch.Infant; aa++)
+                        {
+                            pass++;
+
+                            <div class="passenger-panel"
+                                 id="pax@(Model.FlightsSearch.Adult
+                 + Model.FlightsSearch.Child
+                 + aa - 1)">
+
+                                <!-- Name -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Title *</label>
+
+                                        <select class="form-select"
+                                                id="title_@(pass)"
+                                                name="title_@(pass)">
+
+                                            <option value="MASTER">Master</option>
+                                            <option value="MISS">Miss</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>First Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="fname_@(pass)"
+                                               name="fname_@(pass)"
+                                               placeholder="First Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Last Name *</label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               id="lname_@(pass)"
+                                               name="lname_@(pass)"
+                                               placeholder="Last Name"
+                                               autocomplete="off" />
+
+                                    </div>
+
+                                </div>
+
+                                <!-- DOB -->
+
+                                <div class="form-row three">
+
+                                    <div class="form-group">
+
+                                        <label>Birth Day</label>
+
+                                        <select class="form-select"
+                                                id="pDay_@(pass)"
+                                                name="pDay_@(pass)">
+
+                                            <option value="">Day</option>
+
+                                            @for (int d = 1; d <= 31; d++)
+                                            {
+                                                <option value="@d.ToString("00")">
+                                                    @d.ToString("00")
+                                                </option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Month</label>
+
+                                        <select class="form-select"
+                                                id="pMonth_@(pass)"
+                                                name="pMonth_@(pass)">
+
+                                            <option value="">Month</option>
+
+                                            <option value="01">Jan</option>
+                                            <option value="02">Feb</option>
+                                            <option value="03">Mar</option>
+                                            <option value="04">Apr</option>
+                                            <option value="05">May</option>
+                                            <option value="06">Jun</option>
+                                            <option value="07">Jul</option>
+                                            <option value="08">Aug</option>
+                                            <option value="09">Sep</option>
+                                            <option value="10">Oct</option>
+                                            <option value="11">Nov</option>
+                                            <option value="12">Dec</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Birth Year</label>
+
+                                        <select class="form-select"
+                                                id="pYear_@(pass)"
+                                                name="pYear_@(pass)">
+
+                                            @for (int y = DateTime.Now.Year - 12; y >= 1924; y--)
+                                            {
+                                                <option value="@y">@y</option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Gender -->
+
+                                <div class="form-row">
+
+                                    <div class="form-group">
+
+                                        <label>Gender *</label>
+
+                                        <div class="gender-box">
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_male_@(pass)"
+                                                       value="1"
+                                                       checked />
+
+                                                Male
+
+                                            </label>
+
+                                            <label>
+
+                                                <input type="radio"
+                                                       name="radio_gender_@(pass)"
+                                                       id="radio_female_@(pass)"
+                                                       value="2" />
+
+                                                Female
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            adultIndex++;
+                        }
+
+                    </div>
+
+                    <!-- ─── Contact Information ─── -->
+                    <div class="form-card">
+
+                        <h5>
+                            <span class="icon">
+                                <img src="~/images/Contact-Information.png"
+                                     style="width:18px;height:18px;object-fit:contain;display:block;">
+                            </span>
+                            Contact Information
+                        </h5>
+
+                        <p class="section-sub">
+                            E-ticket and booking updates will be sent here.
+                        </p>
+
+                        <div class="form-row">
+
+                            <!-- Email -->
+
+                            <div class="form-group" id="grp_email">
+
+                                <label>Email Address <span>*</span></label>
+
+                                <input type="text"
+                                       name="email"
+                                       id="email"
+                                       class="form-control"
+                                       placeholder="you@example.com"
+                                       value=""
+                                       autocomplete="off" />
+
+                                <span class="err-msg">
+                                    Please enter a valid email address.
+                                </span>
+
+                            </div>
+
+                            <!-- Phone -->
+
+                            <div class="form-group" id="grp_phone">
+
+                                <label>Phone Number <span>*</span></label>
+
+                                <input type="text"
+                                       name="phone"
+                                       id="phone"
+                                       class="form-control"
+                                       placeholder="+1 212-555-0100"
+                                       value=""
+                                       autocomplete="off" />
+
+                                <span class="err-msg">
+                                    Please enter your phone number.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ─── Billing Address ─── -->
+                    <div class="form-card">
+
+                        <h5>
+                            <span class="icon">
+                                <img src="~/images/Billing-Address.png"
+                                     style="width:18px;height:18px;object-fit:contain;display:block;">
+                            </span>
+                            Billing Address
+                        </h5>
+
+                        <p class="section-sub">
+                            Please enter your billing address exactly as registered with your payment method.
+                        </p>
+
+                        <!-- Address -->
+
+                        <div class="form-row single">
+
+                            <div class="form-group" id="grp_address">
+
+                                <label>Street Address <span>*</span></label>
+
+                                <input type="text"
+                                       name="address"
+                                       id="address"
+                                       class="form-control"
+                                       placeholder="123 Main Street"
+                                       autocomplete="off"
+                                       oninput="clearError('address','grp_address')" />
+
+                                <span class="err-msg">
+                                    Please enter your address.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- City / Country / Zip -->
+
+                        <div class="form-row three">
+
+                            <!-- City -->
+
+                            <div class="form-group" id="grp_city">
+
+                                <label>City <span>*</span></label>
+
+                                <input type="text"
+                                       name="city"
+                                       id="city"
+                                       class="form-control"
+                                       placeholder="City"
+                                       autocomplete="off"
+                                       oninput="clearError('city','grp_city')" />
+
+                                <span class="err-msg">
+                                    City is required.
+                                </span>
+
+                            </div>
+
+                            <!-- Country -->
+
+                            <div class="form-group" id="grp_country">
+
+                                <label>Country <span>*</span></label>
+
+                                <select class="form-select"
+                                        name="countryCode"
+                                        id="countryCode"
+                                        onchange="clearError('countryCode','grp_country')">
+
+                                    <option value="">Select Country</option>
+
+                                    <!-- Yahan apni puri country list paste kar dijiye -->
+                                    <option value="US" selected>United States</option>
+                                    <option value="IN">India</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+
+                                </select>
+
+                                <span class="err-msg">
+                                    Please select a country.
+                                </span>
+
+                            </div>
+
+                            <!-- Postal Code -->
+
+                            <div class="form-group" id="grp_postcode">
+
+                                <label>ZIP / Postal Code <span>*</span></label>
+
+                                <input type="text"
+                                       name="postcode"
+                                       id="postcode"
+                                       class="form-control"
+                                       placeholder="Postal Code"
+                                       autocomplete="off"
+                                       oninput="clearError('postcode','grp_postcode')" />
+
+                                <span class="err-msg">
+                                    Postal Code is required.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                </div>
+
+                <!-- ===== RIGHT: Price Summary ===== -->
+                <div>
+                    <div class="price-box">
+                        <div class="flight-recap">
+                            <div style="width:60px;height:60px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #e9ecf0;overflow:hidden;">
+
+
+                                <img src="@("https://fareschoices.com/Content/airline/fit/" + Model.Flights.Outbound[0].Airline.Code + ".gif")" style="width:52px;height:auto;object-fit:contain;display:block;" />
+
+
+                            </div>
+                            <div>
+
+                                <div class="flight-route" id="summaryRoute">
+                                    @Model.Flights.Outbound[0].FromAirport.Code
+                                    →
+                                    @Model.Flights.Outbound[Model.Flights.Outbound.Count - 1].ToAirport.Code
+                                </div>
+
+                                <div class="flight-meta" id="summaryMeta">
+
+                                    @(Model.FlightsSearch.FlightWay == FlightWay.RoundTrip ? "Round Trip" : "One Way")
+                                    ·
+                                    @Model.Flights.Outbound[0].CabinClass
+                                    ·
+                                    @(Model.Flights.FlightFare.Adult) Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : "")
+
+                                    @if (Model.Flights.FlightFare.Child > 0)
+                                    {
+                                        <text> · @(Model.Flights.FlightFare.Child) Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
+                                    }
+
+                                    @if (Model.Flights.FlightFare.Infant > 0)
+                                    {
+                                        <text> · @(Model.Flights.FlightFare.Infant) Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
+                                    }
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span>Outbound</span>
+                            <span>
+                                @Model.Flights.Outbound[0].DepartureDate.ToString("dd MMM")
+                                ·
+                                @Model.Flights.Outbound[0].DepartureDate.ToString("hh:mm tt")
+                            </span>
+                        </div>
+                        @if (Model.FlightsSearch.FlightWay == FlightWay.RoundTrip)
+                        {
+                            <div class="info-row">
+                                <span>Return</span>
+                                <span>
+                                    @Model.Flights.Inbound[0].DepartureDate.ToString("dd MMM")
+                                    ·
+                                    @Model.Flights.Inbound[0].DepartureDate.ToString("hh:mm tt")
+                                </span>
+                            </div>
+                        }
+
+
+                        <div class="info-row">
+                            <span>Cabin</span>
+                            <span>@Model.Flights.Outbound[0].CabinClass</span>
+                        </div>
+
+                        @if (Session["com"] != null && Session["com"] != "")
+                        {
+                            <div class="price-rows">
+
+                                <!-- Adult Fare -->
+                                <div class="price-row">
+                                    <span>Base Fare (@Model.Flights.FlightFare.Adult Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : ""))</span>
+                                    <span id="baseFare">
+                                        @ViewBag.Currency
+                                        @((((Model.Flights.FlightFare.AdultFare + Model.Flights.FlightFare.AdultTax + Model.Flights.FlightFare.AdultMarkup) * Model.Flights.FlightFare.Adult) - 12).ToString("0.00"))
+                                    </span>
+                                </div>
+
+                                <!-- Child Fare -->
+                                @if (Model.Flights.FlightFare.Child > 0)
+                                {
+                                    <div class="price-row">
+                                        <span>Child (@Model.Flights.FlightFare.Child)</span>
+                                        <span>
+                                            @ViewBag.Currency
+                                            @((((Model.Flights.FlightFare.ChildFare + Model.Flights.FlightFare.ChildTax + Model.Flights.FlightFare.ChildMarkup) * Model.Flights.FlightFare.Child) - 12).ToString("0.00"))
+                                        </span>
+                                    </div>
+                                }
+
+                                <!-- Infant Fare -->
+                                @if (Model.Flights.FlightFare.Infant > 0)
+                                {
+                                    <div class="price-row">
+                                        <span>Infant (@Model.Flights.FlightFare.Infant)</span>
+                                        <span>
+                                            @ViewBag.Currency
+                                            @((((Model.Flights.FlightFare.InfantFare + Model.Flights.FlightFare.InfantTax + Model.Flights.FlightFare.InfantMarkup) * Model.Flights.FlightFare.Infant) - 12).ToString("0.00"))
+                                        </span>
+                                    </div>
+                                }
+
+                                <!-- Travel Protection -->
+                                <div class="price-row travelProtection" style="display:none;">
+                                    <span>Travel Protection</span>
+                                    <span>@ViewBag.Currency 15.95</span>
+                                </div>
+
+                                <!-- Coupon -->
+                                <div class="price-row discount" id="discountLine" style="display:none;">
+                                    <span>Coupon Discount</span>
+                                    <span id="discountAmt">-@ViewBag.Currency 0.00</span>
+                                </div>
+
+                                <!-- Total -->
+                                <div class="price-row total">
+                                    <span>Total</span>
+                                    <span id="totalAmt">
+                                        @ViewBag.Currency @(((Model.Flights.FlightFare.GrandTotal) - 12).ToString("0.00"))
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <input type="hidden" id="hdnBaggagePrice" name="hdnBaggagePrice" value="0" />
+                            <input type="hidden" id="hdnBaggagePcs" name="hdnBaggagePcs" value="0" />
+                            <input type="hidden" id="hdnFreeChangeAmt" name="hdnFreeChangeAmt" value="0" />
+                            <input type="hidden" id="hdnFinalfare" name="hdnFinalfare"
+                                   value="@(((flights.FlightFare.GrandTotal)-12).ToString("0.00"))" />
+                        }
+                        else
+                        {
+                            <div class="price-rows">
+
+                                <!-- Adult Fare -->
+                                <div class="price-row">
+                                    <span>Base Fare (@Model.Flights.FlightFare.Adult Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : ""))</span>
+                                    <span id="baseFare">
+                                        @ViewBag.Currency
+                                        @(((Model.Flights.FlightFare.AdultFare + Model.Flights.FlightFare.AdultTax + Model.Flights.FlightFare.AdultMarkup) * Model.Flights.FlightFare.Adult).ToString("0.00"))
+                                    </span>
+                                </div>
+
+                                <!-- Child Fare -->
+                                @if (Model.Flights.FlightFare.Child > 0)
+                                {
+                                    <div class="price-row">
+                                        <span>Child (@Model.Flights.FlightFare.Child)</span>
+                                        <span>
+                                            @ViewBag.Currency
+                                            @(((Model.Flights.FlightFare.ChildFare + Model.Flights.FlightFare.ChildTax + Model.Flights.FlightFare.ChildMarkup) * Model.Flights.FlightFare.Child).ToString("0.00"))
+                                        </span>
+                                    </div>
+                                }
+
+                                <!-- Infant Fare -->
+                                @if (Model.Flights.FlightFare.Infant > 0)
+                                {
+                                    <div class="price-row">
+                                        <span>Infant (@Model.Flights.FlightFare.Infant)</span>
+                                        <span>
+                                            @ViewBag.Currency
+                                            @(((Model.Flights.FlightFare.InfantFare + Model.Flights.FlightFare.InfantTax + Model.Flights.FlightFare.InfantMarkup) * Model.Flights.FlightFare.Infant).ToString("0.00"))
+                                        </span>
+                                    </div>
+                                }
+
+                                <!-- Travel Protection -->
+                                <div class="price-row travelProtection" style="display:none;">
+                                    <span>Travel Protection</span>
+                                    <span>@ViewBag.Currency 15.95</span>
+                                </div>
+
+                                <!-- Coupon -->
+                                <div class="price-row discount" id="discountLine" style="display:none;">
+                                    <span>Coupon Discount</span>
+                                    <span id="discountAmt">-@ViewBag.Currency 0.00</span>
+                                </div>
+
+                                <!-- Total -->
+                                <div class="price-row total">
+                                    <span>Total</span>
+                                    <span id="totalAmt">
+                                        @ViewBag.Currency @(Model.Flights.FlightFare.GrandTotal.ToString("0.00"))
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <input type="hidden" id="hdnBaggagePrice" name="hdnBaggagePrice" value="0" />
+                            <input type="hidden" id="hdnBaggagePcs" name="hdnBaggagePcs" value="0" />
+                            <input type="hidden" id="hdnFreeChangeAmt" name="hdnFreeChangeAmt" value="0" />
+                            <input type="hidden" id="hdnFinalfare" name="hdnFinalfare"
+                                   value="@(flights.FlightFare.GrandTotal.ToString("0.00"))" />
+                        }
+
+                        <!-- Coupon -->
+                        @*<div class="coupon-wrap">
+                            <label>Have a coupon code?</label>
+                            <div class="coupon-input-row">
+                                <input type="text" id="couponInput" placeholder="e.g. FLY10" oninput="this.value=this.value.toUpperCase()">
+                                <button class="btn-coupon" id="couponBtn" onclick="applyCoupon()">Apply</button>
+                            </div>
+                            <div class="coupon-msg" id="couponMsg"></div>
+                        </div>*@
+
+                        <!-- Pay button -->
+                    <button type="submit"
+                            class="btn-pay"
+                            name="make_payment1"
+                            id="make_payment1">
+
+                        <span class="btn-pay-text">
+                            Continue to Book
+                            <span id="btnTotal">
+                                @ViewBag.Currency
+                                @(Session["com"] != null && Session["com"].ToString() != ""
+                ? ((Model.Flights.FlightFare.GrandTotal - 12).ToString("0.00"))
+                : Model.Flights.FlightFare.GrandTotal.ToString("0.00"))
+                            </span>
+                        </span>
+
+                        <div class="spinner"></div>
+
+                    </button>
+                        @*<div class="secure-note">🛡️ Secured by 256-bit SSL encryption</div>*@
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="flights-loading" style="display:none;" id="search_popup">
+            <section class="process_banner">
+                <div class="search-details">
+                    <div class="container">
+                        <div class="search-logo"><img src="~/Content/images/logo.png" alt=""></div>
+
+                        <h3>Please wait while we are processing...</h3>
+
+                        <div class="search-flightDetail">
+                            <div class="flightDlt-row">
+                                <div class="search-city" id="spFrom"></div>
+                                <div class="search-date">
+                                    <span class="plane_main">
+                                        <bdo id="spFromDate">Fri 02 Jun 2023</bdo>
+                                    </span>
+                                </div>
+                                <div class="search-city" id="spTo"></div>
+                            </div>
+
+                            <div class="flightDlt-row" id="spFLightway">
+
+                                <div class="search-city" id="spFrom2"></div>
+                                <div class="search-date">
+                                    <span class="plane_main">
+                                        <bdo id="spToDate">Mon 10 Jun 2023</bdo>
+                                    </span>
+                                </div>
+                                <div class="search-city" id="spTo2"></div>
+                            </div>
+                        </div>
+                        <h3>Passengers</h3>
+                        <p><strong id="spADT"></strong> Adult(s), <strong id="spCHD">0</strong> Child(ren), <strong id="spINF">0</strong> Infant</p>
+
+                        <div class="progressBar">
+                            <div class="meter red">
+                                <span></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript" src="@(ViewBag.StaticURL + "Content/js/jquery.payment.min.js")"></script>
+    <script type="text/javascript" src="@(ViewBag.StaticURL + "Content/js/jquery.validate.min.js")"></script>
+    <script type="text/javascript">
+     $(document).ready(function () {
+         $("#idpmt").hide();
+         $("#show_cvv_code_detail").click(function(){
+             $("#cvv_code_detail").show();
+         });
+         $("#cvv_code_close").click(function(){
+             $("#cvv_code_detail").hide();
+         });
+         $(".adult_datepicker").datepicker({
+             dateFormat: 'dd-mm-yy',
+             minDate: "-90Y",
+             maxDate: '@DateTime.Now.AddYears(+12).ToString("dd-MM-yyyy")',
+             autoHide: true,
+             yearRange: "-100:+0",
+             changeMonth: true,
+             changeYear: true
+         });
+         $(".child_datepicker").datepicker({
+             dateFormat: 'dd-mm-yy',
+             minDate: '@DateTime.Now.AddYears(-12).ToString("dd-MM-yyyy")',
+             maxDate: '@DateTime.Now.AddYears(0).ToString("dd-MM-yyyy")',
+             autoHide: true,
+             changeMonth: true,
+             changeYear: true
+         });
+         $(".infant_datepicker").datepicker({
+             dateFormat: 'dd-mm-yy',
+             minDate: '@DateTime.Now.AddYears(-2).ToString("dd-MM-yyyy")',
+             maxDate: '@DateTime.Now.ToString("dd-MM-yyyy")',
+             autoHide: true,
+             changeMonth: true,
+             changeYear: true
+         });
+
+         $(".bk_smry_view_detail").click(function(){
+             $("html, body").animate({ scrollTop: "650px" });
+             $(".bk_main_bro").slideDown();
+         });
+
+         $("#pass_cont_next").click(function () {
+             var pass_flag = true;
+             $(".chk_pass").each(function(i){
+                 if($(this).val().trim(' ') == "")
+                 {
+                     alert("Please enter your passenger detail.");
+                     $(this).focus();
+                     pass_flag = false;
+                     return false;
+                 }
+             });
+         });
+
+         $("#pass_addr_back").click(function () {
+             $("#addr_detail").slideUp(function(){ $("#cont_detail").slideDown(); });
+         });
+         $("#pass_addr_next").click(function(){
+             if(addr_flag)
+             {
+                 $("#addr_detail").slideUp(function(){ $("#card_detail").slideDown(); });
+                 $("#addr_detail_edit").show();
+             }
+         });
+         $("#addr_detail_edit").click(function(){
+             $(this).hide();
+             $("#cont_detail_edit").show();
+             $("#card_detail").slideUp(function(){ $("#cont_detail").slideUp(function(){ $("#addr_detail").slideDown(); }); });
+         });
+     });
+    </script>
+    <script type="text/javascript">
+        $("[data-numeric]").payment('restrictNumeric');
+        $(".cc_number").payment('formatCardNumber');
+        $(".cc_exp").payment('formatCardExpiry');
+        $(".cc_cvc").payment('formatCardCVC');
+        function SetCvvNo() {
+            var _cardType = $('#cardType').val();
+            if (_cardType === "amex") {
+                $("#cc_cvv").attr('maxlength', '4');
+            }
+            else {
+                $("#cc_cvv").attr('maxlength', '3');
+            }
+        }
+        function SetCardType() {
+            var cardType = $.payment.cardType($('.cc_number').val());
+            $("#cc_card_type").val(cardType);
+            $('#cardType').val(cardType).change();
+        }
+    </script>
+    <script>
+     $(document).ready(function(){
+         $(".baggage").click(function(){
+             $(".baggage").removeClass("baggage-select");
+             $(this).addClass("baggage-select");
+         });
+     });
+
+     $(document).ready(function(){
+         $('#spBaggagePrice').text($('#hdnhand_weight').val()+ ' kg PP');
+         $('#spBagname').text('Cabin Bag');
+         if($('#baggage_0').prop("checked") == true)
+         {
+             $('#spBagname1').text('Check In Luggage');
+             $("#spBaggagePrice1").html("Not Included");
+         }
+         if($('#baggage_1').prop("checked") == true)
+         {
+             $('#spBagname1').text('Check In Luggage');
+             $("#spBaggagePrice1").html($('#hdnhold_weight').val()+" kg Included");
+         }
+     });
+     $(document).ready(function(){
+         $("#makePayment_Totalfare").text($("#spntotfare").text());
+         if($('#chkFreeChange').prop("checked") == true)
+         {
+         }
+         $('#chkFreeChange').change(function(){
+             var finalfare=parseFloat($("#spntotfare").text());
+             var freechange=parseFloat(0.0);
+             if($('#chkFreeChange').prop("checked") == true)
+             {
+                 freechange= parseFloat($('#spfreechange').text());
+                 $('#hdnFreeChangeAmt').val(freechange);
+                 finalfare=finalfare+freechange;
+             }
+             else
+             {
+                 freechange= parseFloat($('#spfreechange').text());
+                 finalfare=finalfare-freechange;
+             }
+             $("#makePayment_Totalfare").text(finalfare);
+             $("#spntotfare").html(finalfare);
+             $("#spntotfare1").html(finalfare);
+             $("#hdnFinalfare").val(finalfare);
+         });
+     });
+     function BaggagePrice(Pcs,BagPrice,GrandTotal,weight)
+     {    $('#spBagname1').text('Check In Luggage');
+         var freechange=parseFloat(0.0);
+         if($('#chkFreeChange').prop("checked") == true)
+         {
+             freechange= parseFloat($('#spfreechange').text());
+         }
+         var grandTotal = (@((Model.Flights.FlightFare.Adult + Model.Flights.FlightFare.Child + Model.Flights.FlightFare.Infant))+freechange+ parseFloat(BagPrice)+ parseFloat(GrandTotal)).toFixed(2);
+         if(BagPrice==="0")
+         {
+             $("#makePayment_Totalfare").text($("#spntotfare").text());
+             $("#spntotfare").html(grandTotal);
+             $("#spntotfare1").html(grandTotal);
+             $("#hdnFinalfare").val(grandTotal);
+             $("#hdnBaggagePrice").val(BagPrice);
+             $("#hdnBaggagePcs").val(Pcs);
+         }
+         else
+         {
+             $("#makePayment_Totalfare").text($("#spntotfare").text());
+             $("#spntotfare").html(grandTotal);
+             $("#spntotfare1").html(grandTotal);
+             $("#hdnFinalfare").html(grandTotal);
+             $("#hdnBaggagePrice").val(BagPrice);
+             $("#hdnBaggagePcs").val(Pcs);
+         }
+
+         if((parseInt(BagPrice)==0) && parseInt(Pcs)==0)
+         {  $("#spBaggagePrice1").html("Not Included");
+         }
+         if((parseInt(BagPrice)>=0) && parseInt(Pcs)==1)
+         { $("#spBaggagePrice1").html(weight+" kg Included");
+         }
+         if((parseInt(BagPrice)>=0) && parseInt(Pcs)==2)
+         {  $("#spBaggagePrice1").html((parseInt(weight) *2)+" kg Included");
+         }
+     }
+    </script>
+    <script>
+     $(document).ready(function(){
+         $('#PassengerInfo').show();
+         $('#addressSec').show();
+         $('#paymentSec').show();
+     });
+
+     $(document).ready(function(){
+         $('#fname_1').keypress(function(){
+             $('#fname_1').css('border-color', '');
+         });
+         $('#lname_1').keypress(function(){
+             $('#lname_1').css('border-color', '');
+         });
+         $('#dob_1').keypress(function(){
+             $('#dob_1').css('border-color', '');
+         });
+         $('#phone').keypress(function(){
+             $('#phone').css('border-color', '');
+         });
+         $('#email').keypress(function(){
+             $('#email').css('border-color', '');
+         });
+         $('#postcode').keypress(function(){
+             $('#postcode').css('border-color', '');
+         });
+         $('#state').keypress(function(){
+             $('#state').css('border-color', '');
+         });
+         $('#city').change(function(){
+             $('#city').css('border-color', '');
+         });
+         $('#address').keypress(function(){
+             $('#address').css('border-color', '');
+         });
+     });
+
+     $('#btnContinue').click(function(){
+         var lboolcheck = true;
+         if ($('#title_1').val().trim() == '') {
+             lboolcheck = false;
+             $('#addressSec').hide();
+             $('#title_1').css('border-color', 'red');
+             alert("Plese Select Title.... ");
+         }
+         if($('#fname_1').val().trim()=='')
+         {   lboolcheck=false;
+             $('#addressSec').hide();
+             $('#fname_1').css('border-color', 'red');
+         }
+         if($('#lname_1').val().trim()=='')
+         {   lboolcheck=false;
+
+             $('#addressSec').hide();
+             $('#lname_1').css('border-color', 'red');
+         }
+         if($('#dob_1').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').hide();
+             $('#dob_1').css('border-color', 'red');
+         }
+         if($('#phone').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').show();
+             $('#phone').css('border-color', 'red');
+         }
+         if($('#email').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').show();
+             $('#email').css('border-color', 'red');
+         }
+         if ($('#address').val().trim() == '') {
+             lboolcheck = false;
+             $('#addressSec').show();
+             $('#address').css('border-color', 'red');
+         }
+         if ($('#city').val().trim() == '') {
+             lboolcheck = false;
+             $('#addressSec').show();
+             $('#city').css('border-color', 'red');
+         }
+         if ($('#postcode').val().trim() == '') {
+             lboolcheck = false;
+             $('#addressSec').show();
+             $('#postcode').css('border-color', 'red');
+         }
+         if(lboolcheck)
+         {
+             $('#PassengerInfo').show();
+             $('#addressSec').show();
+             $('#fname_1').css('border-color', '');
+             $('#lname_1').css('border-color', '');
+             $('#email').css('border-color', '');
+             $('#phone').css('border-color', '');
+             $('#dob_1').css('border-color', '');
+             $('#postcode').css('border-color', '');
+             $('#btnContinue').hide();
+             $('#lblbook').hide();
+             $('#idpmt').show();
+             $.ajax(
+                {
+                    type: "POST",
+                    url: "@(ViewBag.StaticURL+ "flight/bookingalert")",
+                    data: {
+                        Phone: $("#phone").val(),
+                        Email: $("#email").val(),
+                        FULLname: $("#title_1").val()+" "+$("#fname_1").val()+" "+$("#lname_1").val(),
+                    },
+                    success: function (data) {
+                    }
+                });
+         }
+     });
+
+     $('#btnNext1').click(function(){
+         var lboolcheck=true;
+         if($('#fname_1').val().trim()=='')
+         {   lboolcheck=false;
+             $('#addressSec').hide();
+             $('#fname_1').css('border-color', 'red');
+         }
+         if($('#lname_1').val().trim()=='')
+         {   lboolcheck=false;
+
+             $('#addressSec').hide();
+             $('#lname_1').css('border-color', 'red');
+         }
+         if($('#dob_1').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').hide();
+             $('#dob_1').css('border-color', 'red');
+         }
+         if($('#phone').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').show();
+             $('#phone').css('border-color', 'red');
+         }
+         if($('#email').val().trim()=='')
+         {lboolcheck=false;
+             $('#addressSec').show();
+             $('#email').css('border-color', 'red');
+         }
+
+         if(lboolcheck)
+         {
+             $('#PassengerInfo').show();
+             $('#addressSec').show();
+             $('#fname_1').css('border-color', '');
+             $('#lname_1').css('border-color', '');
+             $('#email').css('border-color', '');
+             $('#phone').css('border-color', '');
+             $('#dob_1').css('border-color', '');
+             $.ajax(
+                {
+                    type: "POST",
+                    url: "@(ViewBag.StaticURL+ "flight/bookingalert")",
+                    data: {
+                        Phone: $("#phone").val(),
+                        Email: $("#email").val(),
+                        FULLname: $("#title_1").val()+" "+$("#fname_1").val()+" "+$("#lname_1").val(),
+                    },
+                    success: function (data) {
+                    }
+                });
+         }
+
+         var lboolcheck = true;
+         if ($('#address').val().trim() == '') {
+             lboolcheck = false;
+             $('#paymentSec').show();
+             $('#address').css('border-color', 'red');
+         }
+         if ($('#city').val().trim() == '') {
+             lboolcheck = false;
+             $('#paymentSec').show();
+             $('#city').css('border-color', 'red');
+         }
+         if ($('#postcode').val().trim() == '') {
+             lboolcheck = false;
+             $('#paymentSec').show();
+             $('#postcode').css('border-color', 'red');
+         }
+         if (lboolcheck) {
+             $('#paymentSec').show();
+             $('#addressSec').hide();
+             $('#postcode').css('border-color', '');
+             $('#city').css('border-color', '');
+             $('#address').css('border-color', '');
+         }
+
+         if ($('#phone').val().trim() == '') {
+             lboolcheck = false;
+             alert("please enter a valid Phone No")
+             $('#phone').focus();
+             return false;
+         }
+         if ($('#email').val().trim() == '') {
+             lboolcheck = false;
+             alert("please enter a valid EmailId")
+             $('#email').focus();
+             return false;
+         }
+     });
+     $('#btnNext2').click(function(){
+         var lboolcheck=true;
+         if($('#address').val().trim()=='')
+         {   lboolcheck=false;
+             $('#paymentSec').show();
+             $('#address').css('border-color', 'red');
+         }
+         if($('#city').val().trim()=='')
+         {   lboolcheck=false;
+             $('#paymentSec').show();
+             $('#city').css('border-color', 'red');
+         }
+         if($('#postcode').val().trim()=='')
+         {
+             lboolcheck=false;
+             $('#paymentSec').show();
+             $('#postcode').css('border-color', 'red');
+         }
+         if(lboolcheck)
+         {   $('#paymentSec').show();
+             $('#addressSec').hide();
+             $('#postcode').css('border-color', '');
+             $('#city').css('border-color', '');
+             $('#address').css('border-color', '');
+         }
+     });
+
+     $(document).ready(function(){
+         $('#paxinfo').click(function(){
+             $('#PassengerInfo').show();
+             $('#addressSec').show();
+             $('#paymentSec').show();
+         });
+         $('#addressinfo').click(function(){
+
+              if($('#phone').val().trim()=='')
+              {
+                  lboolcheck = false;
+                  alert("please enter a valid Phone No")
+                  $('#phone').focus();
+                  return false;
+              }
+              if($('#email').val().trim()=='')
+              {
+                 lboolcheck = false;
+                  alert("please enter a valid EmailId")
+                  $('#email').focus();
+                 return false;
+             }
+
+             $('#PassengerInfo').show();
+              $('#addressSec').show();
+             $('#paymentSec').show();
+              $.ajax(
+                {
+                    type: "POST",
+                    url: "@(ViewBag.StaticURL+ "flight/bookingalert")",
+                    data: {
+                        Phone: $("#phone").val(),
+                        Email: $("#email").val(),
+                        FULLname: $("#title_1").val()+" "+$("#fname_1").val()+" "+$("#lname_1").val(),
+                    },
+                    success: function (data) {
+                    }
+                  });
+         });
+         $('#paymentinfo').click(function(){
+
+             $('#PassengerInfo').show();
+             $('#addressSec').show();
+             $('#paymentSec').show();
+         });
+     });
+
+     function IsValidate()
+     {
+         if($('#fname_1').val().trim()=='')
+         {   alert("Please enter your first name.");
+             $('#fname_1').css('border-color', 'red');
+             $('#PassengerInfo').show();
+             $('#addressSec').show();
+             $('#paymentSec').show();
+             return false;
+         }
+         if($('#lname_1').val().trim()=='')
+         {    alert("Please enter your last name.");
+             $('#lname_1').css('border-color', 'red');
+             return false;
+         }
+
+         if ($('#pDay_1').val().trim() == '') {
+             alert("Please Select Date of Birth.");
+             $('#pDay_1').css('border-color', 'red');
+             $('#pDay_1').focus();
+             return false;
+         }
+
+         if ($("#email").val().trim(' ') == "")
+         {
+             alert("Please enter your email.");
+             $('#email').css('border-color', 'red');
+             $("#email").focus();
+             return false;
+         }
+         else if ($("#email").val().trim(' ') != "")
+         {
+             var filter = @("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+[a-zA-Z0-9.-]+[a-zA-Z0-9]+.[a-z]{0,4}$/");
+             if (!filter.test(document.getElementById("email").value)) {
+                 alert("Please enter your valid email.");
+                 $('#email').css('border-color', 'red');
+                 document.getElementById("email").focus();
+                 return false;
+             }
+         }
+
+         if ($("#phone").val().trim(' ') == "") {
+             alert("Please enter your phone number.");
+             $("#phone").focus();
+             $('#phone').css('border-color', 'red');
+
+             return false;
+         }
+         else if ($("#phone").val().trim(' ') != "") {
+             var phoneNum = $("#phone").val().replace(/[^\d]/g, '');
+             if (!(phoneNum.length > 7 && phoneNum.length < 15)) {
+                 alert("Please enter your valid phone number.");
+                 $("#phone").focus();
+                 $('#phone').css('border-color', 'red');
+                 return false;
+             }
+         }
+
+         if ($("#address").val().trim(' ') == "")
+         {
+             alert("Please enter your full address.");
+             $('#address').css('border-color', 'red');
+             $("#address").focus();
+             return false;
+         }
+         if ($("#countryCode").val().trim(' ') == "")
+         {
+             alert("Please select your country.");
+             $('#countryCode').css('border-color', 'red');
+             $("#countryCode").focus();
+             return false;
+         }
+         if ($("#city").val().trim(' ') == "")
+         {
+             alert("Please enter your city.");
+             $('#city').css('border-color', 'red');
+             $("#city").focus();
+             return false;
+         }
+         if ($("#postcode").val().trim(' ') == "")
+         {
+             alert("Please enter your postcode.");
+             $('#postcode').css('border-color', 'red');
+             $("#postcode").focus();
+             return false;
+         }
+         return true;
+     }
+    </script>
+
+    <script>
+
+         $("#make_payment1").click(function () {
+             debugger;
+             if (!IsValidate()) {
+                 return false;
+             }
+             else {
+                 $("#spFLightway").hide();
+                 $("#spFrom").text($("#flight_from").val());
+                 $("#spTo").text($("#flight_to").val());
+                 $("#spFromDate").text($("#flight_from_date").val().split(" ")[0]);
+                 $("#spToDate").text($("#flight_to_date").val().split(" ")[0]);
+                 $("#spTo2").text($("#flight_from").val());
+                 $("#spFrom2").text($("#flight_to").val());
+                 $("#spADT").text($("#flight_adult").val());
+                 $("#spCHD").text($("#flight_child").val());
+                 $("#spINF").text($("#flight_infant").val());
+                 var flight_way = $("#flight_way").val();
+                 if (flight_way == "RoundTrip") {
+                     $("#spFLightway").show();
+                 }
+                 $("#search_popup").show();
+                 return true;
+             }
+         });
+         $("#make_payment").click(function () {
+             if (!IsValidate()) {
+                 return false;
+             }
+             else {
+                 return true;
+             }
+         });
+         $("#flight_submit").click(function () {
+           if ($("#flight_from").val().trim(' ') == "") {
+                 alert("Please enter your departure airport");
+                 $("#flight_from").focus();
+                 return false;
+             }
+             else if ($("#flight_to").val().trim(' ') == "") {
+                 alert("Please enter your destination airport");
+                 $("#flight_to").focus();
+                 return false;
+             }
+             else if ($("#flight_to").val().trim(' ') == $("#flight_from").val().trim(' ')) {
+                 alert("Departure Airport and Destination Airport can't be same!!");
+                 $("#flight_to").focus();
+                 return false;
+             }
+           else {
+               var fway = 1;
+               if ($('#flight_way').val() == "RoundTrip") {
+                   var fway = 2;
+               }
+               var fcls ="4"
+               if ($('#flight_class').val() == "Economy") {
+                   fcls = "4";
+               }
+               if ($('#flight_class').val() == "Premimum Economy") {
+                   fcls = "3";
+               }
+               if ($('#flight_class').val() == "Business") {
+                   fcls = "2";
+               }
+               if ($('#flight_class').val() == "First") {
+                   fcls = "1";
+               }
+                 var from = "&From=" + $("#flight_from").val();
+                 var to = "&To=" + $("#flight_to").val();
+               var fromDate = "&DepDate=" + $("#flight_from_date").val().split("/")[2].split(" ")[0] + "-" + $("#flight_from_date").val().split("/")[0] + "-" + $("#flight_from_date").val().split("/")[1];
+               var toDate = "&RetDate=";
+                 $("#spFrom").text($("#flight_from").val());
+                 $("#spTo").text($("#flight_to").val());
+               $("#spFromDate").text($("#flight_from_date").val().split(" ")[0]);
+                 $("#spFLightway").hide();
+               if (fway == "2") {
+                   toDate = "&RetDate=" + $("#flight_to_date").val().split("/")[2].split(" ")[0] + "-" + $("#flight_to_date").val().split("/")[0] + "-" + $("#flight_to_date").val().split("/")[1];
+                   $("#spToDate").text($("#flight_to_date").val().split(" ")[0]);
+                   $("#spTo2").text($("#flight_from").val().split("-")[0].split(" ")[0]);
+                   $("#spFrom2").text($("#flight_to").val().split("-")[0].split(" ")[0]);
+                     $("#spFLightway").show();
+                 }
+                 var adult = "&Adult=" + $("#flight_adult").val();
+                 var child = "&Child=" + $("#flight_child").val();
+                 var infant = "&Infant=" + $("#flight_infant").val();
+                 $("#spADT").text($("#flight_adult").val());
+                 $("#spCHD").text($("#flight_child").val());
+                 $("#spINF").text($("#flight_infant").val());
+                 var airline = "&Airline=" + ""; //$("#flight_airline").val();
+                 var isdirect = "&IsDirect=" + (($("input[name=is_direct]:checked").val() == "1") ? "true" : "false");
+                 var isflexi = "&IsFlexi=" + (($("input[name=flight_flexi]:checked").val() == "1") ? "true" : "false");
+                 fway_s = "&FlightWay=" + fway;
+                 fcls_s = "&FlightClass=" + fcls;
+                 var tolPass = $("#flight_adult").val() + "Adt," + $("#flight_child").val() + "Chd," + $("#flight_infant").val() + "Inf";
+                 $("#spPass").text(tolPass);
+                 var str = "@(ViewBag.WebsiteURL + "flight/search?")SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=GBP";
+                 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                 $("#fp_from_name").html($("#flight_from").val().split(",")[1]);
+                 $("#fp_from_code").html($("#flight_from").val().split("-")[0]);
+                 $("#fp_to_name").html($("#flight_to").val().split(",")[1]);
+                 $("#fp_to_code").html($("#flight_to").val().split("-")[0]);
+                 var dd_tp = $("#flight_from_date").val().split("-");
+                 $("#fp_dep_date").html(dd_tp[0] + " " + monthNames[dd_tp[1] - 1] + ", " + dd_tp[2]);
+                 if (fway == "2") {
+                     var rd_tp = $("#flight_to_date").val().split("-");
+                     $("#fp_ret_date").html(rd_tp[0] + " " + monthNames[rd_tp[1] - 1] + ", " + rd_tp[2]);
+                 } else {
+                     $("#fp_ret_date").html("-");
+                 }
+                 var fc_tp = (parseInt(fcls) == 1) ? "First" : (parseInt(fcls) == 2) ? "Business" : (parseInt(fcls) == 3) ? "Premimum Economy" : "Economy";
+                 $("#fp_flight_class").html(fc_tp);
+                 var ps_tp = $("#flight_adult").val() + " Adult" + ((parseInt($("#flight_child").val()) > 0) ? ", " + $("#flight_child").val() + " Child" : "") + ((parseInt($("#flight_infant").val()) > 0) ? ", " + $("#flight_infant").val() + " Infant" : "");
+                 $("#fp_passenger").html(ps_tp);
+                 $("#search_popup").show();
+                 $('#plane').css({ 'left': '0%' }).animate({ 'left': '88%' }, 15000);
+                 $('#plane_color').css({ 'width': '10%' }).animate({ 'width': '98%' }, 15000);
+                 window.location = str;
+             }
+         });
+    </script>
+
+
+
+}
+<script>
+    function switchPassenger(index) {
+
+        // Remove active class from tabs
+        document.querySelectorAll(".ptab").forEach(function (btn) {
+            btn.classList.remove("active");
+        });
+
+        // Remove active class from panels
+        document.querySelectorAll(".passenger-panel").forEach(function (panel) {
+            panel.classList.remove("active");
+        });
+
+        // Active selected tab
+        document.querySelectorAll(".ptab")[index].classList.add("active");
+
+        // Active selected panel
+        document.querySelectorAll(".passenger-panel")[index].classList.add("active");
+    }
+</script>

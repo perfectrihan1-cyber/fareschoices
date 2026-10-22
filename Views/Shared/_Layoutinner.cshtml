@@ -1,0 +1,473 @@
+﻿@using Viman.Models
+@{
+    Func<string, string> Static = path => ViewBag.StaticURL + path;
+}
+
+<!DOCTYPE html>
+<html lang="en-gb">
+<head runat="server">
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/images/favicon.ico")" />
+    @RenderSection("metatags", required: false)
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fareschoices</title>
+    <link rel="icon" type="image/x-icon" href="~/images/favicon.ico">
+    <link href="~/css/style.css" rel="stylesheet">
+    @*<link href="~/css/index.css" rel="stylesheet">*@
+    <link href="~/css/responsive.css" rel="stylesheet" />
+    <link href="~/fontawesome/css/all.css" rel="stylesheet">
+    <link href="~/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="~/Content/flcss/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/flcss/home.css" rel="stylesheet" />
+    <link href="~/Content/flcss/inner.css" rel="stylesheet" />
+    <link href="~/Content/flcss/animated.css" rel="stylesheet" />
+    <link href="~/Content/flcss/common.css" rel="stylesheet" />
+    <link href="~/Content/flcss/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/Content/searchAirport.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.css" rel="stylesheet" />
+    <script src="/Content/fljs/jquery-3.7.0.min.js"></script>
+    <script src="/Content/fljs/jquery-ui.min.js"></script>
+    <script src="/Content/fljs/bootstrap.min.js"></script>
+    <script src="/Content/fljs/script.js"></script>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div>
+        @{Html.RenderPartial("~/Views/Shared/headerinner.cshtml");}
+        <!-- WRAPPER CONTENT -->
+        <!-- FOOTER-->
+        @RenderBody()
+       
+        @RenderSection("Scripts", required: false)
+
+        <div class="NewFLightLoader" id="search_popup" style="display: none;">
+            <div class="loadingloader">
+                <img src="/images/Circle.png" width="150px" />
+            </div>
+            <p>Searching for the best deals for you...</p>
+            <h4>
+                <span id="spFrom"></span> <span id="spFLightway">-</span> <span id="spTo"></span>
+            </h4>
+            <h4>
+                <span id="spFromDate"></span> <span id="spFLightway">-</span> <span id="spToDate"></span>
+            </h4>
+            <p>
+                <strong id="spADT"></strong> Adult(s),
+                <strong id="spCHD">0</strong> Child(ren),
+                <strong id="spINF">0</strong> Infant
+            </p>
+        </div>
+    </div>
+
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $("#flight_from_date").datepicker({
+                    minDate: '+0D',
+                    maxDate: '+15M +1D',
+                    dateFormat: 'dd-mm-yy',
+                    showButtonPanel: false,
+                    numberOfMonths: 1,
+                    onSelect: (function (date) {
+                        $("#flight_from_date").val(date);
+                        if ($("input:radio[name='flight_way']:checked").val() == "2") {
+                            setTimeout(function () {
+                                $('#flight_to_date').datepicker('show');
+                            }, 0)
+                        }
+                    })
+                });
+            });
+            $(function () {
+                $("#flight_to_date").datepicker({
+                    minDate: -0, maxDate: '+15M +1D',
+                    dateFormat: 'dd-mm-yy',
+                    showButtonPanel: false,
+                    numberOfMonths: 1,
+                    beforeShow: customRange,
+                    onSelect: (function (date) {
+                        $("#flight_to_date").val(date);
+                    })
+                });
+            });
+
+            function customRange(a) {
+                var b = new Date();
+                var c = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+                if (a.id == 'flight_to_date') {
+                    if ($("#flight_from_date").datepicker('getDate') != null) {
+                        c = $("#flight_from_date").datepicker('getDate');
+                    }
+                }
+                return {
+                    minDate: c = new Date(c.getFullYear(), c.getMonth(), c.getDate())
+                }
+            }
+
+            $("#flight_submit").click(function () {
+                debugger;
+                if ($("#flight_from").val().trim(' ') == "") {
+                    alert("Please enter your departure airport");
+                    $("#flight_from").focus();
+                    return false;
+                }
+                else if ($("#flight_from").val().trim(' ').indexOf('-') != 3) {
+                    alert("Kindly select departure airport from auto suggest list!");
+                    $("#flight_from").focus();
+                    return false;
+                }
+                else if ($("#flight_to").val().trim(' ').trim(' ') == "") {
+                    alert("Please enter your destination airport");
+                    $("#flight_to").focus();
+                    return false;
+                }
+                else if ($("#flight_to").val().trim(' ').indexOf('-') != 3) {
+                    alert("Kindly select destination airport from auto suggest list!");
+                    $("#flight_to").focus();
+                    return false;
+                }
+                else if ($("#flight_to").val().trim(' ') == $("#flight_from").val().trim(' ')) {
+                    alert("Departure Airport and Destination Airport can't be same!!");
+                    $("#flight_to").focus();
+                    return false;
+                }
+                else {
+                    var fway = $('input[name=flight_way]:checked').val();
+                    var fcls = $('input[name=flight_class]:checked').val();
+                    var from = "&From=" + $("#flight_from").val().split("-")[0];
+                    var to = "&To=" + $("#flight_to").val().split("-")[0];
+                    var fromDate = "&DepDate=" + $("#flight_from_date").val().split("-")[2] + "-" + $("#flight_from_date").val().split("-")[1] + "-" + $("#flight_from_date").val().split("-")[0];
+                    var toDate = "&RetDate=";
+                    $("#spFrom").text($("#flight_from").val().split("-")[0]);
+                    $("#spTo").text($("#flight_to").val().split("-")[0]);
+                    $("#spFromDate").text($("#flight_from_date").val());
+                    $("#spFLightway").hide();
+
+                    if (fway == "2") {
+                        toDate = "&RetDate=" + $("#flight_to_date").val().split("-")[2] + "-" + $("#flight_to_date").val().split("-")[1] + "-" + $("#flight_to_date").val().split("-")[0];
+                        $("#spToDate").text($("#flight_to_date").val());
+                        $("#spTo2").text($("#flight_from").val().split("-")[0]);
+                        $("#spFrom2").text($("#flight_to").val().split("-")[0]);
+                        $("#spFLightway").show();
+                    }
+
+                    var adultCount = (parseInt($("#flight_adult").val()) || 0) + (parseInt($("#flight_ss").val()) || 0);
+                    var childCount = parseInt($("#flight_child").val()) || 0;
+                    var infantCount = (parseInt($("#flight_infant").val()) || 0) + (parseInt($("#flight_aa").val()) || 0);
+
+                    var adult = "&Adult=" + adultCount;
+                    var child = "&Child=" + childCount;
+                    var infant = "&Infant=" + infantCount;
+
+                    $("#spADT").text(adultCount);
+                    $("#spCHD").text(childCount);
+                    $("#spINF").text(infantCount);
+
+                    var airline = "&Airline=" + "";
+                    var isdirect = "&IsDirect=" + (($("input[name=is_direct]:checked").val() == "1") ? "true" : "false");
+                    var isflexi = "&IsFlexi=" + (($("input[name=flight_flexi]:checked").val() == "1") ? "true" : "false");
+                    fway_s = "&FlightWay=" + fway;
+                    fcls_s = "&FlightClass=" + fcls;
+                    var tolPass = $("#ddlAdult").val() + "Adult," + $("#ddlChild").val() + "Child," + $("#ddlInfant").val() +"Infant";
+                    $("#spPass").text(tolPass);
+                    var str = "/flight/search?SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=USD";
+                    $("#search_popup").show();
+                    window.location = str;
+                }
+            });
+            var selectFrom = false;
+            var selectTo = false;
+
+        });
+            $(".booking_btn").click(function () {
+                debugger;
+              var flight_opt = $(this).data("id");
+                var fway = "2";
+                var fcls = "4";
+                var from = "&From=" + $("#flight_from" + flight_opt).val();
+                var to = "&To=" + $("#flight_to" + flight_opt).val();
+                var fromDate = "&DepDate=" + $("#flight_from_date" + flight_opt).val().split("-")[2] + "-" + $("#flight_from_date" + flight_opt).val().split("-")[1] + "-" + $("#flight_from_date" + flight_opt).val().split("-")[0];
+                var toDate = "&RetDate=";
+              $("#spFrom").text($("#flight_from" + flight_opt).val());
+              $("#spTo").text($("#flight_to" + flight_opt).val());
+              $("#spFromDate").text($("#flight_from_date" + flight_opt).val());
+                if (fway == "2") {
+                        toDate = "&RetDate=" + $("#flight_to_date" + flight_opt).val().split("-")[2] + "-" + $("#flight_to_date" + flight_opt).val().split("-")[1] + "-" + $("#flight_to_date" + flight_opt).val().split("-")[0];
+                    $("#spToDate").text($("#flight_to_date" + flight_opt).val());
+                    $("#spToDate").text($("#flight_to_date" + flight_opt).val());
+                    $("#spTo2").text($("#flight_from" + flight_opt).val());
+                    $("#spFrom2").text($("#flight_to" + flight_opt).val());
+              }
+                var adult = "&Adult=" + 1;
+                var child = "&Child=" + 0;
+                var infant = "&Infant=" + 0;
+                var airline = "&Airline=" + ""; // $("#flight_airline").val();
+                var isdirect = "&IsDirect=" + ("false");
+                var isflexi = "&IsFlexi=" + ("false");
+                fway_s = "&FlightWay=" + fway;
+              fcls_s = "&FlightClass=" + fcls;
+              $("#spADT").text(1);
+              $("#spCHD").text($("#flight_child").val());
+              $("#spINF").text($("#flight_infant").val());
+                var tolPass =  1 + "Adult" ;
+                $("#spPass").text(tolPass);
+              var str = "@(ViewBag.WebsiteURL + "flight/search?")SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=USD";
+                      $("#search_popup").show();
+                      window.location = str;
+ });
+        </script>
+
+        <script>
+            function openFunction() {
+                $("#divOverlay").show();
+                $("#res-menu").addClass("opened");
+            }
+            function closeFunction() {
+                $("#divOverlay").hide();
+                $("#res-menu").removeClass("opened");
+            }
+            $(window).on('scroll', function () {
+                if ($(this).scrollTop() > 60) {
+                    $('.sticky-area').addClass("is-sticky");
+                }
+                else {
+                    $('.sticky-area').removeClass("is-sticky");
+                }
+            });
+
+            function openFunction() {
+                $("#divOverlay").show();
+                $("#res-menu").addClass("opened");
+            }
+            function closeFunction() {
+                $("#divOverlay").hide();
+                $("#res-menu").removeClass("opened");
+            }
+
+            $(document).ready(function () {
+                $("#divOverlay").on("click", function () {
+                    $(this).hide();
+                    $("#res-menu").removeClass("opened");
+                });
+            });
+
+            $(function () {
+
+                $(".flight_way").click(function () {
+                    //debugger;
+                    var flight_id = $(this).attr("id");
+                    if (flight_id == "rdoOneway") {
+                        $("#flight_to_date").hide();
+                        $("#flight_to_dateCal").hide();
+                    }
+                    else {
+                        $("#flight_to_date").show();
+                        $("#flight_to_dateCal").show();
+                    }
+                });
+
+                $("#cabin_class").on("click", function () {
+                    $("#cabin_list").css("display", "block");
+                });
+                $("#cabin_list ul li").on("click", function () {
+                    $("#cabin_list").css("display", "none");
+                    $("#cabin_class span").html($(this).attr("data-text"));
+                });
+                $("#mopt").on("click", function () {
+                    $("#mopt_list").css("display", "block");
+                });
+                $("#mopt_list button").on("click", function () {
+                    $("#mopt_list").css("display", "none");
+                });
+                $("#mob-tab").on("click", function () {
+                    $("#mob-tab_list").css("display", "block");
+                });
+                $("#mob-tab_list .close, a").on("click", function () {
+                    $("#mob-tab_list").css("display", "none");
+                });
+                $("#pax-content").on("click", function (event) {
+                    $("#pax-detail").toggleClass("opened");
+                    if ($(window).width() <= 610) {
+                        if ($("#pax-detail").hasClass("opened")) {
+                            $("body").css({ height: "100%", width: "100%", overflow: "hidden", position: "fixed" });
+                        }
+                        else {
+                            $("body").css({ height: "100%", width: "100%", overflow: "", position: "" });
+                        }
+                    }
+                    if ($(window).width() <= 610) {
+                        if ($("#mopt_list").hasClass("opened")) {
+                            $("body").css({ height: "100%", width: "100%", overflow: "hidden", position: "fixed" });
+                        }
+                        else {
+                            $("body").css({ height: "100%", width: "100%", overflow: "", position: "" });
+                        }
+                    }
+                    event.stopPropagation();
+                });
+                $("#pax-detail .close-butt").on("click", function (event) {
+                    $("#pax-detail").removeClass("opened");
+                    $("body").css({ height: "100%", width: "100%", overflow: "", position: "" });
+                    event.preventDefault();
+                });
+
+                var Current_ADT = parseInt($("input[id*='txtAdults']").val(), 10);
+                var Current_CHD = parseInt($("input[id*='txtChilds']").val(), 10);
+                var Current_INF = parseInt($("input[id*='txtInfants']").val(), 10);
+                if (Current_ADT == 1) {
+                    $("#btnadt_dec").attr("disabled", "disabled").addClass("disabled_btn");
+                }
+                else {
+                    $("#btnadt_dec").removeAttr("disabled").removeClass("disabled_btn");
+                }
+                if (Current_CHD == 0) {
+                    $("#btnchd_dec").attr("disabled", "disabled").addClass("disabled_btn");
+                }
+                else {
+                    $("#btnchd_dec").removeAttr("disabled").removeClass("disabled_btn");
+                }
+                if (Current_INF == 0) {
+                    $("#btninf_dec").attr("disabled", "disabled").addClass("disabled_btn");
+                }
+                else {
+                    $("#btninf_dec").removeAttr("disabled").removeClass("disabled_btn");
+                }
+
+                if ((Current_ADT + Current_CHD) >= 9) {
+                    $("#btnadt_inc, #btnchd_inc").attr("disabled", "disabled").addClass("disabled_btn");
+                }
+                else {
+                    $("#btnadt_inc, #btnchd_inc").removeAttr("disabled").removeClass("disabled_btn");
+                }
+
+                if (Current_ADT == Current_INF) {
+                    $("#btninf_inc").attr("disabled", "disabled").addClass("disabled_btn");
+                }
+                else {
+                    $("#btninf_inc").removeAttr("disabled").removeClass("disabled_btn");
+                }
+                $("#fh-pax-content").on("click", function () {
+                    $("#fh-pax-detail").css("display", "block");
+                });
+                $("#fh-pax-detail .close-butt").on("click", function () {
+                    $("#fh-pax-detail").css("display", "none");
+                });
+                $("#mpax-content").on("click", function () {
+                    $("#mpax-detail").css("display", "block");
+                });
+                $("#mpax-detail .close-butt").on("click", function () {
+                    $("#mpax-detail").css("display", "none");
+                });
+
+                $(".button").on("click", function () {
+                    var $button = $(this);
+                    var oldValue = $button.parent().find("input").val();
+                    if ($button.children("i").hasClass("fa-plus")) {
+                        var newVal = parseFloat(oldValue) + 1;
+                    } else {
+                        if (oldValue > 0) {
+                            var newVal = parseFloat(oldValue) - 1;
+                        }
+                        else {
+                            newVal = 0;
+                        }
+                    }
+                    $button.parent().find("input").val(newVal);
+                });
+            });
+            $(window).resize(function () {
+                var ht = $("#be-panel").innerHeight();
+                if ($(window).width() <= 610) {
+                    $("#be-panel").css("margin-top", 20);
+                }
+                else {
+                    $("#be-panel").css("margin-top", -ht);
+                }
+            });
+            $(".inc_der").click(function () {
+                debugger
+                var fld = $(this).attr("data-field");
+                var fld_opt = $(this).attr("data-opt");
+                var adt = parseInt($("#flight_adult").val());
+               
+                var chd = parseInt($("#flight_child").val());
+                var inf = parseInt($("#flight_infant").val());
+               
+                if (fld == "adult") {
+                    if (fld_opt == "+") {
+                        if ((adt + chd) < 9) {
+                            $("#flight_adult").val(adt + 1);
+                        }
+                    }
+                    else if (fld_opt == "-") {
+                        if (adt > 1) {
+                            $("#flight_adult").val(adt - 1);
+                        }
+                    }
+                }
+                else if (fld == "child") {
+                    if (fld_opt == "+") {
+                        if ((adt + chd) < 9) {
+                            $("#flight_child").val(chd + 1);
+                        }
+                    }
+                    else if (fld_opt == "-") {
+                        if (chd > 0) {
+                            $("#flight_child").val(chd - 1);
+                        }
+                    }
+                }
+                else if (fld == "infant") {
+                    if (fld_opt == "+") {
+                        if (adt >= inf + chd) {
+                            $("#flight_infant").val(inf + 1);
+                        }
+                    }
+                    else if (fld_opt == "-") {
+                        if (inf > 0) {
+                            $("#flight_infant").val(inf - 1);
+                        }
+                    }
+                }
+                getPassenger();
+            });
+
+            $("input[name=flight_class]").change(function () {
+                getPassenger();
+            });
+            $("#prsn_add").click(function () {
+                $("#prsn_popup").slideDown("slow");
+            });
+            $("#prsn_done").click(function () {
+                $("#prsn_popup").slideUp("slow");
+            });
+            $('body').click(function () {
+                $("#prsn_popup").slideUp("slow");
+            });
+            $('.prp_popup').click(function (e) {
+                e.stopPropagation();
+            });
+
+            function getPassenger() {
+                var TravelTotal = 0;
+                TravelTotal += parseInt($("#flight_adult").val()) || 0;
+                TravelTotal += parseInt($("#flight_child").val()) || 0;
+                TravelTotal += parseInt($("#flight_infant").val()) || 0;
+               
+                if (TravelTotal === 1) {
+                    $("#pass_info").val(TravelTotal + " Traveler");
+                }
+                else {
+                    $("#pass_info").val(TravelTotal + " Travelers");
+                }
+            }
+        </script>
+        
+      
+</body>
+</html>
