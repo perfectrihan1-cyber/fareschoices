@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -12,113 +12,169 @@ namespace Viman.Models
     {
         public static SqlConnection GetConnection()
         {
-            return new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+                builder.ConnectTimeout = 3;
+                return new SqlConnection(builder.ConnectionString);
+            }
+            catch
+            {
+                return new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+            }
         }
         public static SqlConnection GetConnectionFlightoffice()
         {
-            return new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionStringFlightoffice"].ConnectionString);
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["ConnectionStringFlightoffice"].ConnectionString);
+                builder.ConnectTimeout = 3;
+                return new SqlConnection(builder.ConnectionString);
+            }
+            catch
+            {
+                return new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionStringFlightoffice"].ConnectionString);
+            }
         }
+        private static DateTime _dbDisabledUntil = DateTime.MinValue;
+
+        public static bool IsDbEnabled()
+        {
+            string enableDb = ConfigurationManager.AppSettings["EnableRemoteDb"];
+            if (string.Equals(enableDb, "false", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return DateTime.UtcNow >= _dbDisabledUntil;
+        }
+
         public static DataSet ExecuteDataset(string commandText, params SqlParameter[] commandParameters)
         {
-            SqlConnection connection = GetConnection();
-            if (connection == null) throw new ArgumentNullException("connection");
-
-            SqlCommand cmd = new SqlCommand();
-            bool mustCloseConnection = false;
-
-            if (connection.State != ConnectionState.Open)
+            if (!IsDbEnabled())
             {
-                mustCloseConnection = true;
-                connection.Open();
-            }
-            else
-            {
-                mustCloseConnection = false;
+                return null;
             }
 
-            cmd.Connection = connection;
-            cmd.CommandTimeout = 120;
-            cmd.CommandText = commandText;
-            cmd.CommandType = CommandType.Text;
-
-            if (commandParameters != null)
+            try
             {
-                foreach (SqlParameter param in commandParameters)
+                SqlConnection connection = GetConnection();
+                if (connection == null) return null;
+
+                SqlCommand cmd = new SqlCommand();
+                bool mustCloseConnection = false;
+
+                if (connection.State != ConnectionState.Open)
                 {
-                    if (param != null)
+                    mustCloseConnection = true;
+                    connection.Open();
+                }
+                else
+                {
+                    mustCloseConnection = false;
+                }
+
+                cmd.Connection = connection;
+                cmd.CommandTimeout = 120;
+                cmd.CommandText = commandText;
+                cmd.CommandType = CommandType.Text;
+
+                if (commandParameters != null)
+                {
+                    foreach (SqlParameter param in commandParameters)
                     {
-                        if ((param.Direction == ParameterDirection.InputOutput || param.Direction == ParameterDirection.Input) && (param.Value == null))
+                        if (param != null)
                         {
-                            param.Value = DBNull.Value;
+                            if ((param.Direction == ParameterDirection.InputOutput || param.Direction == ParameterDirection.Input) && (param.Value == null))
+                            {
+                                param.Value = DBNull.Value;
+                            }
+                            cmd.Parameters.Add(param);
                         }
-                        cmd.Parameters.Add(param);
                     }
                 }
+
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                {
+                    DataSet ds = new DataSet();
+
+                    da.Fill(ds);
+                    cmd.Parameters.Clear();
+
+                    if (mustCloseConnection)
+                        connection.Close();
+
+                    return ds;
+                }
             }
-
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            catch (Exception)
             {
-                DataSet ds = new DataSet();
-
-                da.Fill(ds);
-                cmd.Parameters.Clear();
-
-                if (mustCloseConnection)
-                    connection.Close();
-
-                return ds;
+                _dbDisabledUntil = DateTime.UtcNow.AddMinutes(5);
+                return null;
             }
         }
 
         public static DataSet ExecuteDatasetFlightoffice(string commandText, params SqlParameter[] commandParameters)
         {
-            SqlConnection connection = GetConnectionFlightoffice();
-            if (connection == null) throw new ArgumentNullException("connection");
-
-            SqlCommand cmd = new SqlCommand();
-            bool mustCloseConnection = false;
-
-            if (connection.State != ConnectionState.Open)
+            if (!IsDbEnabled())
             {
-                mustCloseConnection = true;
-                connection.Open();
-            }
-            else
-            {
-                mustCloseConnection = false;
+                return null;
             }
 
-            cmd.Connection = connection;
-            cmd.CommandTimeout = 120;
-            cmd.CommandText = commandText;
-            cmd.CommandType = CommandType.Text;
-
-            if (commandParameters != null)
+            try
             {
-                foreach (SqlParameter param in commandParameters)
+                SqlConnection connection = GetConnectionFlightoffice();
+                if (connection == null) return null;
+
+                SqlCommand cmd = new SqlCommand();
+                bool mustCloseConnection = false;
+
+                if (connection.State != ConnectionState.Open)
                 {
-                    if (param != null)
+                    mustCloseConnection = true;
+                    connection.Open();
+                }
+                else
+                {
+                    mustCloseConnection = false;
+                }
+
+                cmd.Connection = connection;
+                cmd.CommandTimeout = 120;
+                cmd.CommandText = commandText;
+                cmd.CommandType = CommandType.Text;
+
+                if (commandParameters != null)
+                {
+                    foreach (SqlParameter param in commandParameters)
                     {
-                        if ((param.Direction == ParameterDirection.InputOutput || param.Direction == ParameterDirection.Input) && (param.Value == null))
+                        if (param != null)
                         {
-                            param.Value = DBNull.Value;
+                            if ((param.Direction == ParameterDirection.InputOutput || param.Direction == ParameterDirection.Input) && (param.Value == null))
+                            {
+                                param.Value = DBNull.Value;
+                            }
+                            cmd.Parameters.Add(param);
                         }
-                        cmd.Parameters.Add(param);
                     }
                 }
+
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                {
+                    DataSet ds = new DataSet();
+
+                    da.Fill(ds);
+                    cmd.Parameters.Clear();
+
+                    if (mustCloseConnection)
+                        connection.Close();
+
+                    return ds;
+                }
             }
-
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            catch (Exception)
             {
-                DataSet ds = new DataSet();
-
-                da.Fill(ds);
-                cmd.Parameters.Clear();
-
-                if (mustCloseConnection)
-                    connection.Close();
-
-                return ds;
+                _dbDisabledUntil = DateTime.UtcNow.AddMinutes(5);
+                return null;
             }
         }
     }

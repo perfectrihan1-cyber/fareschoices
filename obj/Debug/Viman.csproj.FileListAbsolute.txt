@@ -1387,3 +1387,26 @@ F:\extra work\24 JUNE\choices\Viman\obj\Debug\Viman.csproj.CoreCompileInputs.cac
 F:\extra work\24 JUNE\choices\Viman\obj\Debug\Viman.csproj.Up2Date
 F:\extra work\24 JUNE\choices\Viman\obj\Debug\Viman.dll
 F:\extra work\24 JUNE\choices\Viman\obj\Debug\Viman.pdb
+C:\laragon\www\fareschoices\obj\Debug\Viman.dll
+C:\laragon\www\fareschoices\obj\Debug\Viman.pdb
+C:\laragon\www\fareschoices\obj\Debug\Viman.csprojResolveAssemblyReference.cache
+C:\laragon\www\fareschoices\bin\roslyn\csc.exe
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\laragon\www\fareschoices\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\laragon\www\fareschoices\bin\roslyn\System.Collections.Immutable.dll
+C:\laragon\www\fareschoices\bin\roslyn\System.Reflection.Metadata.dll
+C:\laragon\www\fareschoices\bin\roslyn\vbc.exe
+C:\laragon\www\fareschoices\bin\roslyn\VBCSCompiler.exe
+C:\laragon\www\fareschoices\bin\roslyn\VBCSCompiler.exe.config
+C:\laragon\www\fareschoices\bin\Viman.dll
+C:\laragon\www\fareschoices\bin\Viman.pdb
+C:\laragon\www\fareschoices\bin\mscorlib.dll
+C:\laragon\www\fareschoices\bin\normidna.nlp
+C:\laragon\www\fareschoices\bin\normnfc.nlp
+C:\laragon\www\fareschoices\bin\normnfd.nlp
+C:\laragon\www\fareschoices\bin\normnfkc.nlp
+C:\laragon\www\fareschoices\bin\normnfkd.nlp

@@ -1,4 +1,4 @@
-﻿@model Viman.Models.FlightsBooking
+@model Viman.Models.FlightsBooking
 @using Viman.Models
 @{
     ViewBag.Title = "Booking";
@@ -181,8 +181,9 @@
 }
 
 <link href="~/css1/checkout.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css1/booking_adv.css?v=2">
 
-<!-- ═══════════════ CHECKOUT PROGRESS ═══════════════ -->
+<!-- ================= CHECKOUT PROGRESS ================= -->
 <div class="checkout-header">
     <div class="checkout-header-inner">
         @*<a href="flight_result.html" class="back-to-results">
@@ -191,15 +192,15 @@
             </a>*@
         <div class="steps">
             <div class="step done">
-                <div class="step-num">✓</div>
+                <div class="step-num"><i class="fa fa-check"></i></div>
                 <span class="step-label">Search</span>
             </div>
-            <span class="step-sep">›</span>
+            <span class="step-sep"><i class="fa fa-chevron-right" style="font-size:10px;"></i></span>
             <div class="step done">
-                <div class="step-num">✓</div>
+                <div class="step-num"><i class="fa fa-check"></i></div>
                 <span class="step-label">Review</span>
             </div>
-            <span class="step-sep">›</span>
+            <span class="step-sep"><i class="fa fa-chevron-right" style="font-size:10px;"></i></span>
             <div class="step active">
                 <div class="step-num">3</div>
                 <span class="step-label">Checkout</span>
@@ -208,7 +209,7 @@
     </div>
 </div>
 
-<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<!-- ================= MAIN CONTENT ================= -->
 <div class="page">
     <div class="listing">
         <form method="post" id="booking_frm" name="booking_frm" action="@Url.Content("~/Flight/Payment")">
@@ -976,26 +977,26 @@
 
                                 <div class="flight-route" id="summaryRoute">
                                     @Model.Flights.Outbound[0].FromAirport.Code
-                                    →
+                                    &rarr;
                                     @Model.Flights.Outbound[Model.Flights.Outbound.Count - 1].ToAirport.Code
                                 </div>
 
                                 <div class="flight-meta" id="summaryMeta">
 
                                     @(Model.FlightsSearch.FlightWay == FlightWay.RoundTrip ? "Round Trip" : "One Way")
-                                    ·
+                                    &bull;
                                     @Model.Flights.Outbound[0].CabinClass
-                                    ·
+                                    &bull;
                                     @(Model.Flights.FlightFare.Adult) Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : "")
 
                                     @if (Model.Flights.FlightFare.Child > 0)
                                     {
-                                        <text> · @(Model.Flights.FlightFare.Child) Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
+                                        <text> &bull; @(Model.Flights.FlightFare.Child) Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
                                     }
 
                                     @if (Model.Flights.FlightFare.Infant > 0)
                                     {
-                                        <text> · @(Model.Flights.FlightFare.Infant) Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
+                                        <text> &bull; @(Model.Flights.FlightFare.Infant) Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
                                     }
 
                                 </div>
@@ -1006,7 +1007,7 @@
                             <span>Outbound</span>
                             <span>
                                 @Model.Flights.Outbound[0].DepartureDate.ToString("dd MMM")
-                                ·
+                                &bull;
                                 @Model.Flights.Outbound[0].DepartureDate.ToString("hh:mm tt")
                             </span>
                         </div>
@@ -1016,7 +1017,7 @@
                                 <span>Return</span>
                                 <span>
                                     @Model.Flights.Inbound[0].DepartureDate.ToString("dd MMM")
-                                    ·
+                                    &bull;
                                     @Model.Flights.Inbound[0].DepartureDate.ToString("hh:mm tt")
                                 </span>
                             </div>

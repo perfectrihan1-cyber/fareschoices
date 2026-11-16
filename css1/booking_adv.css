@@ -1,0 +1,436 @@
+/* ========================================================
+   FaresChoices Advanced Booking Experience (booking_adv.css)
+   ======================================================== */
+
+body {
+    background: #f8fafc !important;
+    font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    color: #0f172a !important;
+}
+
+/* ── Scope isolation: Protect footer trust strip from booking.css collisions ── */
+.footer-trust-strip .trust-item {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    flex: 0 1 auto !important;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+/* ── Main Two-Column Layout ── */
+.main-wrap {
+    max-width: 1240px !important;
+    margin: 28px auto 60px !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    gap: 26px !important;
+    align-items: flex-start !important;
+}
+
+.left-col {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+}
+
+.right-col {
+    width: 380px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    position: sticky;
+    top: 20px;
+}
+
+/* ── Booking Header Breadcrumb ── */
+.book-header {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 14px 20px !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+
+.book-header span {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.01em;
+}
+
+.book-header p {
+    margin: 0 0 0 auto !important;
+    padding: 5px 12px !important;
+    border-radius: 999px !important;
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border: 1px solid #bfdbfe !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+}
+
+/* ── Site / Provider Option Cards ── */
+.site-card {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    margin-bottom: 14px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease !important;
+    overflow: hidden !important;
+}
+
+.site-card:hover {
+    border-color: #93c5fd !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+.site-card.best {
+    border-color: #10b981 !important;
+    border-width: 2px !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12) !important;
+}
+
+.best-badge-bar {
+    background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+    padding: 8px 20px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border-bottom: none !important;
+}
+
+.card-top {
+    padding: 16px 20px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.site-logo-wrap {
+    width: 120px !important;
+    flex-shrink: 0 !important;
+}
+
+.site-logo {
+    height: 38px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    font-size: 13.5px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2) !important;
+}
+
+.site-meta {
+    flex: 1 1 0% !important;
+}
+
+.site-name {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin-bottom: 3px !important;
+}
+
+.site-stars {
+    color: #f59e0b !important;
+    font-size: 12px !important;
+    letter-spacing: 1px !important;
+}
+
+.site-reviews {
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+.price-main {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+}
+
+.select-btn {
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    padding: 10px 22px !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease !important;
+}
+
+.select-btn:hover {
+    filter: brightness(1.08) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
+}
+
+.select-btn.green-btn {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28) !important;
+}
+
+.select-btn.green-btn:hover {
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.38) !important;
+}
+
+.card-details {
+    padding: 12px 20px 14px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 12px 22px !important;
+    background: #fcfdfe !important;
+    border-top: 1px solid #f1f5f9 !important;
+}
+
+.detail-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+.detail-icon {
+    color: #2563eb !important;
+    font-size: 12.5px !important;
+}
+
+.detail-item.green .detail-icon {
+    color: #059669 !important;
+}
+
+/* ── Trust Row under cards ── */
+.trust-row {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-top: 20px !important;
+}
+
+.trust-row .trust-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 12px 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03) !important;
+}
+
+.trust-row .trust-icon {
+    font-size: 18px !important;
+    color: #2563eb !important;
+}
+
+/* ── Right Column Sidebar Cards ── */
+.right-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+    margin-bottom: 16px !important;
+}
+
+.right-card-header {
+    background: linear-gradient(135deg, #0e1b4d 0%, #1e293b 100%) !important;
+    color: #ffffff !important;
+    padding: 13px 18px !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.right-card-header span {
+    color: #93c5fd !important;
+    font-weight: 500 !important;
+    font-size: 11.5px !important;
+    margin-left: auto !important;
+}
+
+.flight-seg {
+    padding: 16px 18px !important;
+}
+
+.seg-airport {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+}
+
+.seg-time {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    margin-top: 2px !important;
+}
+
+.seg-plane {
+    color: #2563eb !important;
+    font-size: 12px !important;
+    margin: 0 4px !important;
+}
+
+.s-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    border: 2px solid #2563eb !important;
+    background: #ffffff !important;
+}
+
+.s-line {
+    flex: 1 !important;
+    height: 1.5px !important;
+    background: #bfdbfe !important;
+}
+
+/* Price breakdown */
+.fare-summary {
+    padding: 16px 18px !important;
+}
+
+.fare-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* ── Modal Dialog ── */
+#partnerModal .modal-content {
+    border: none !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2) !important;
+    overflow: hidden !important;
+}
+
+#partnerModal .modal-header {
+    background: #0e1b4d !important;
+    color: #ffffff !important;
+    padding: 16px 22px !important;
+    border-bottom: none !important;
+}
+
+#partnerModal .modal-title {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+}
+
+#partnerModal .partner-body {
+    padding: 22px !important;
+    font-size: 13.5px !important;
+    color: #334155 !important;
+    line-height: 1.6 !important;
+}
+
+#partnerModal .partner-note {
+    background: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    margin: 14px 0 !important;
+    font-size: 12.5px !important;
+    color: #1e40af !important;
+}
+
+#partnerModal .modal-footer {
+    padding: 14px 22px !important;
+    border-top: 1px solid #f1f5f9 !important;
+    background: #f8fafc !important;
+}
+
+/* ── Mobile & Responsive Breakpoints ── */
+@media (max-width: 960px) {
+    .main-wrap {
+        flex-direction: column !important;
+        gap: 20px !important;
+        margin: 16px auto 40px !important;
+        padding: 0 14px !important;
+    }
+
+    .right-col {
+        width: 100% !important;
+        position: static !important;
+    }
+
+    .trust-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .card-top {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+
+    .site-price-block {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        text-align: left !important;
+        margin-top: 8px !important;
+        padding-top: 8px !important;
+        border-top: 1px dashed #e2e8f0 !important;
+    }
+
+    .select-btn {
+        margin-left: auto !important;
+    }
+
+    .trust-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .book-header p {
+        margin-left: 0 !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+}

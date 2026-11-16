@@ -1,4 +1,4 @@
-﻿@model Viman.Models.FlightsResult
+@model Viman.Models.FlightsResult
 @using Viman.Models
 
 @{
@@ -9,60 +9,12 @@
 
 
 <link href="~/css1/flight_result.css" rel="stylesheet" />
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
+<link href="~/css1/flight_result_adv.css?v=7" rel="stylesheet" />
 
-        // Trip Type Dropdown
-        const tripTypeBtn = document.getElementById("tripTypeBtn");
-        const tripTypeDropdown = document.getElementById("tripTypeDropdown");
-
-        if (tripTypeBtn && tripTypeDropdown) {
-
-            tripTypeBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                tripTypeDropdown.classList.toggle("open");
-            });
-
-            tripTypeDropdown.addEventListener("click", function (e) {
-                e.stopPropagation();
-            });
-        }
-
-        // Traveller Dropdown
-        const travellerBtn = document.getElementById("travellerBtn");
-        const travellerDropdown = document.getElementById("travellerDropdown");
-
-        if (travellerBtn && travellerDropdown) {
-
-            travellerBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                travellerDropdown.classList.toggle("open");
-            });
-
-            travellerDropdown.addEventListener("click", function (e) {
-                e.stopPropagation();
-            });
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener("click", function () {
-
-            if (tripTypeDropdown) {
-                tripTypeDropdown.classList.remove("open");
-            }
-
-            if (travellerDropdown) {
-                travellerDropdown.classList.remove("open");
-            }
-
-        });
-
-    });   
-</script>
 <style>
 
     .priceFilter .ui-widget-header {
-        background: #526BF1 !important;
+        background: #1668E3 !important;
         
     }
 
@@ -95,24 +47,24 @@
 
             <!-- COLLAPSED STATE -->
             <div class="sky-collapsed" id="skyCollapsed">
-                <div class="sky-pill">
+                <div class="sky-pill" onclick="expandSearch()" style="cursor: pointer;">
                     <span class="sky-pill-icon">
                         <i class="fa fa-search"></i>
                     </span>
 
                     <span class="sky-pill-route">
-                        @(Model.FlightsSearch.From.Code) – @(Model.FlightsSearch.To.Code)
+                        @(Model.FlightsSearch.From.Code) &ndash; @(Model.FlightsSearch.To.Code)
                     </span>
 
-                    <span class="sky-pill-dot">·</span>
+                    <span class="sky-pill-dot">&bull;</span>
 
                     <span class="sky-pill-meta">
                         @(Model.FlightsSearch.DepDate.ToString("dd MMM yy"))
                         @if (Model.FlightsSearch.FlightWay == FlightWay.RoundTrip)
                         {
-                            <text> - @(Model.FlightsSearch.RetDate.ToString("dd MMM yy"))</text>
+                            <text> &ndash; @(Model.FlightsSearch.RetDate.ToString("dd MMM yy"))</text>
                         }
-                        ·
+                        &bull;
                         @Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant)
                         Traveller(s)
                     </span>
@@ -130,7 +82,7 @@
                     <div class="sky-type-select" id="tripTypeBtn">
 
                         <span id="tripTypeLabel">
-                            @((ViewBag.flightWay == "OneWay") ? "→ One Way" : "↩ Round Trip")
+                            @((ViewBag.flightWay == "OneWay") ? "One Way" : "Round Trip")
                         </span>
 
                         <span class="sky-dd-arrow">
@@ -148,7 +100,7 @@
                                        value="2"
                                        @((ViewBag.flightWay == "RoundTrip" || ViewBag.flightWay == "") ? "checked" : "") />
 
-                                <span>↩ Round Trip</span>
+                                <span>Round Trip</span>
 
                             </label>
 
@@ -161,7 +113,7 @@
                                        value="1"
                                        @((ViewBag.flightWay == "OneWay") ? "checked" : "") />
 
-                                <span>→ One Way</span>
+                                <span>One Way</span>
 
                             </label>
 
@@ -172,16 +124,8 @@
 
                         <!-- Summary -->
                         <div class="sky-traveller-summary" id="prsn_add">
-
-                            <input type="text" style="background-color: transparent; color: #f3f1ee;"
-                                   id="pass_info"
-                                   name="pass_info"
-                                   readonly
-                                   class="sky-traveller-input ind_inputBox"
-                                   value="@Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant) Traveller(s), Economy" />
-
-                            
-
+                            <span id="pass_info_text" style="color: #ffffff; font-weight: 500; font-size: 13.5px; white-space: nowrap;">@Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant) Traveller(s), @((int)Model.FlightsSearch.FlightClass == 1 ? "First" : (int)Model.FlightsSearch.FlightClass == 2 ? "Business" : (int)Model.FlightsSearch.FlightClass == 3 ? "Premium Economy" : "Economy")</span>
+                            <input type="hidden" id="pass_info" name="pass_info" value="@Convert.ToInt32(Model.FlightsSearch.Adult + Model.FlightsSearch.Child + Model.FlightsSearch.Infant) Traveller(s), @((int)Model.FlightsSearch.FlightClass == 1 ? "First" : (int)Model.FlightsSearch.FlightClass == 2 ? "Business" : (int)Model.FlightsSearch.FlightClass == 3 ? "Premium Economy" : "Economy")" />
                         </div>
 
                         <!-- Existing dropdown -->
@@ -297,22 +241,22 @@
                                 <div class="sky-cabin-options">
 
                                     <label>
-                                        <input type="radio" id="flight_class_4" name="flight_class" value="4" checked />
+                                        <input type="radio" id="flight_class_4" name="flight_class" value="4" @((int)Model.FlightsSearch.FlightClass == 4 || (int)Model.FlightsSearch.FlightClass == 0 ? "checked" : "") />
                                         Economy
                                     </label>
 
                                     <label>
-                                        <input type="radio" id="flight_class_3" name="flight_class" value="3" />
+                                        <input type="radio" id="flight_class_3" name="flight_class" value="3" @((int)Model.FlightsSearch.FlightClass == 3 ? "checked" : "") />
                                         Premium Economy
                                     </label>
 
                                     <label>
-                                        <input type="radio" id="flight_class_2" name="flight_class" value="2" />
+                                        <input type="radio" id="flight_class_2" name="flight_class" value="2" @((int)Model.FlightsSearch.FlightClass == 2 ? "checked" : "") />
                                         Business
                                     </label>
 
                                     <label>
-                                        <input type="radio" id="flight_class_1" name="flight_class" value="1" />
+                                        <input type="radio" id="flight_class_1" name="flight_class" value="1" @((int)Model.FlightsSearch.FlightClass == 1 ? "checked" : "") />
                                         First
                                     </label>
 
@@ -342,9 +286,7 @@
 
                     <!-- From -->
                     <div class="sky-field sky-from">
-
                         <label class="sky-flabel">From</label>
-
                         <input type="text"
                                id="flight_from"
                                name="flight_from"
@@ -352,18 +294,16 @@
                                value="@(ViewBag.fromName)"
                                placeholder="Origin"
                                autocomplete="off" />
+                    </div>
 
-                        <div class="sky-swap-btn" title="Swap">
-                            <i class="fa fa-exchange-alt"></i>
-                        </div>
-
+                    <!-- Swap Button between From and To -->
+                    <div class="sky-swap-btn" id="swapAirport" title="Swap Origin and Destination">
+                        <i class="fa fa-exchange-alt"></i>
                     </div>
 
                     <!-- To -->
                     <div class="sky-field sky-to">
-
                         <label class="sky-flabel">To</label>
-
                         <input type="text"
                                id="flight_to"
                                name="flight_to"
@@ -371,15 +311,14 @@
                                value="@(ViewBag.toName)"
                                placeholder="Destination"
                                autocomplete="off" />
-
                     </div>
 
+                    <!-- Vertical Divider -->
+                    <div class="sky-divider"></div>
+
                     <!-- Departure -->
-
                     <div class="sky-field sky-depart">
-
                         <label class="sky-flabel">Depart</label>
-
                         <input type="text"
                                id="flight_from_date"
                                name="flight_from_date"
@@ -388,39 +327,27 @@
                                placeholder="DD-MM-YYYY"
                                autocomplete="off"
                                readonly />
-
-                       
-
                     </div>
 
                     <!-- Return -->
-
-                    <div class="sky-field sky-return" id="returnField">
-
+                    <div class="sky-field sky-return" id="returnField" style="@((ViewBag.flightWay == "OneWay") ? "display:none" : "")">
                         <label class="sky-flabel">Return</label>
-
                         <input type="text"
                                id="flight_to_date"
                                name="flight_to_date"
-                               class="sky-finput ind_inputBox"
+                               class="sky-finput"
                                value="@((ViewBag.retDate!="") ? ViewBag.retDate : DateTime.Now.AddDays(8).ToString("dd-MM-yyyy"))"
                                placeholder="DD-MM-YYYY"
                                autocomplete="off"
                                readonly />
-
-                       
-
                     </div>
-                    <div class="sky-search-wrap">
 
+                    <div class="sky-search-wrap">
                         <a id="flight_submit"
                            name="flight_submit"
                            class="sky-search-btn">
-
-                            <span style="color:white">Search</span>
-
+                            <span>Search</span>
                         </a>
-
                     </div>
                 </div>
 
@@ -435,10 +362,10 @@
 
 
 
-        <!-- ═══════════════ MAIN ═══════════════ -->
+        <!-- --------------- MAIN --------------- -->
 <div class="main">
 
-    <div class="filter">
+    <div class="filter" id="skyFilterPanel">
         <div class="filterHead">
             <div class="filterHead-mobile">
                 <span>Filters</span>
@@ -454,7 +381,11 @@
                     <input type="checkbox" checked="checked" class="StopOvr" name="stop_0" id="stop_0" value="0" />
 
                     <div class="flabel">
-                        Direct<div class="fsub"> from @((Model.StopExtra[0].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[0].TotalCost))</div>
+                        Direct
+                        @if (Model.StopExtra != null && Model.StopExtra.Count > 0 && Model.StopExtra[0].TotalCost > 0)
+                        {
+                            <div class="fsub">from @(ViewBag.Currency)@(Math.Floor(Model.StopExtra[0].TotalCost))</div>
+                        }
                     </div>
                 </label>
             </div>
@@ -464,7 +395,11 @@
                     <input type="checkbox" checked="checked" class="StopOvr" name="stop_1" id="stop_1" value="1" />
                     <span class="checkTxt">
                         <div class="flabel">
-                            1 Stop<div class="fsub"> from @((Model.StopExtra[1].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[1].TotalCost))</div>
+                            1 Stop
+                            @if (Model.StopExtra != null && Model.StopExtra.Count > 1 && Model.StopExtra[1].TotalCost > 0)
+                            {
+                                <div class="fsub">from @(ViewBag.Currency)@(Math.Floor(Model.StopExtra[1].TotalCost))</div>
+                            }
                         </div>
                     </span>
                 </label>
@@ -474,7 +409,11 @@
                     <input type="checkbox" checked="checked" class="StopOvr" name="stop_2" id="stop_2" value="2" />
                     <span class="checkTxt">
                         <div class="flabel">
-                            2 Stops <div class="fsub"> from @((Model.StopExtra[2].TotalCost == 0) ? "No Flight" : ViewBag.Currency + " " + Math.Floor(Model.StopExtra[2].TotalCost))</div>
+                            2 Stops
+                            @if (Model.StopExtra != null && Model.StopExtra.Count > 2 && Model.StopExtra[2].TotalCost > 0)
+                            {
+                                <div class="fsub">from @(ViewBag.Currency)@(Math.Floor(Model.StopExtra[2].TotalCost))</div>
+                            }
                         </div>
                     </span>
                 </label>
@@ -562,30 +501,33 @@
                 {
 
                     <div class="filterCheck">
-                        <label for="chk_Direct_@(airlineItem.Airline.Code)">
+                        <label for="airline_@(Ar)">
                             <input type="checkbox" checked="checked" class="airline_flt" name="airline_chk_@(Ar)" id="airline_@(Ar)" value="@(airlineItem.Airline.Code)" data-id="@(Ar)" />
                             <span class="checkTxt">
-                                <span>@(airlineItem.Airline.Name)</span> &nbsp;&nbsp;&nbsp;
+                                <span>@(airlineItem.Airline.Name)</span>
                                 <bdo>$@(Math.Floor(airlineItem.TotalCost))</bdo>
                             </span>
                         </label>
                     </div>
                     Ar++;
                 }
-                <a href="javascript:void(0);" class="SellectAll_flt">Select all</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a href="javascript:void(0);" class="ClearAll_flt">Clear all</a>
+                <div class="airline-actions" style="margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                    <a href="javascript:void(0);" class="SellectAll_flt" style="color: #1668e3; font-weight: 700; text-decoration: none;">Select all</a>
+                    <span style="color: #cbd5e1;">|</span>
+                    <a href="javascript:void(0);" class="ClearAll_flt" style="color: #1668e3; font-weight: 700; text-decoration: none;">Clear all</a>
+                </div>
             </div>
 
 
-            <h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800!important;">Price <a href="javascript:void(0);" class="ClearPrice_flt">reset filter</a></h3>
+            <h3 style="text-transform: uppercase; font-size: 11px!important; font-weight: 800!important; display: flex; align-items: center; justify-content: space-between;">Price <a href="javascript:void(0);" class="ClearPrice_flt" style="color: #1668e3; font-size: 11px!important; font-weight: 700!important; text-transform: uppercase; text-decoration: none;">reset filter</a></h3>
             <div class="priceFilter">
                 <div id="slider-range" class="scal_price"></div>
                 <p class="price_range">
-                    <span id="min_price_sp">$ @(Model.MinPrice)</span>
-                    <span id="max_price_sp">$ @(Model.MaxPrice)</span>
+                    <span id="min_price_sp">$@(Model.MinPrice)</span>
+                    <span id="max_price_sp">$@(Model.MaxPrice)</span>
                 </p>
                 <input type="text" class="min_max_price" name="min_price" id="min_price" value="@(Model.MinPrice)" style="display:none;" />
                 <input type="text" class="min_max_price" name="max_price" id="max_price" value="@(Model.MaxPrice)" style="display:none;" />
-                <div id="slider-range" class="scal_price"></div>
             </div>
         </div>
     </div>
@@ -642,28 +584,24 @@
                                 {
                                     k++;
 
-                                    <div class="fcard flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
+                                    <div class="fcard flight_main flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
                                         <input type="hidden" name="flight_id_@(k)" id="flight_id_@(k)" value="@(flights.FlightId)" />
 
                                         <div class="card-body">
 
                                             <input type="hidden" id="hfromflight_@(k)" name="hfromflight_@(k)" value="@(outboundList[0].SegmentRef)" data-stop="@(outboundList.Count - 1)" />
                                             <div class="airline-name">
-                                                @if (@flights.Airline.Code == "WN")
-                                                {
-                                                    <div class="alogo">
-                                                        <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
-                                                    </div>
-                                                    <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
-                                                }
-                                                else if (@flights.Airline != null)
-                                                {
-                                            <div class="alogo">
-                                                <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
-                                            </div>
-
-                                                    <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
-                                                }
+                                                <div class="alogo">
+                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + (flights.Airline != null ? flights.Airline.Code : "") + ".gif")" 
+                                                         alt="@(flights.Airline != null ? flights.Airline.Name : "")" 
+                                                         title="@(flights.Airline != null ? flights.Airline.Name : "")" 
+                                                         width="17px" 
+                                                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';" />
+                                                    <span class="fallback-airline-badge" style="display:none; width:22px; height:22px; border-radius:6px; background:#eff6ff; color:#1668E3; align-items:center; justify-content:center; font-size:11px;">
+                                                        <i class="fa fa-plane"></i>
+                                                    </span>
+                                                </div>
+                                                <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
                                             </div>
 
                                             <div class="flight-main">
@@ -696,14 +634,18 @@
 
                                                 <div class="price-block">
                                                     <div class="price-left">
-                                                        <div class="deals-lbl"> <a style="flex: 1; margin-block: auto !important; color: #508EEF !important;" href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn"><i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details</a></div>
+                                                        <div class="deals-lbl"> 
+                                                            <a href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1668E3 !important; padding:4px 12px; border-radius:20px; font-size:11.5px !important; font-weight:700; text-decoration:none;">
+                                                                <i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details
+                                                            </a>
+                                                        </div>
                                                         <input type="hidden" name="Prc_@(k)" id="Prc_@(k)" value="@(flights.TotalCost.ToString("0.00"))" />
                                                         <div class="pbig">$@(flights.TotalCost.ToString("0.00"))</div>
                                                         <div class="psub">per person, return</div>
                                                     </div>
-                                                    <a href="javascript:void(0);" class="bookBtn booking_btn" style="background-color: #6D52F1 !important;" data-id="@(k)"><span>Select</span> </a>
-                                                    @*<a href="javascript:void(0);" style="width:fit-content;" class="btn-sel org bookBtn booking_btn" data-id="@(k)"><span>Select</span> </a>*@
-                                                    @*<button class="btn-sel org">Select &#8594;</button>*@
+                                                    <a href="javascript:void(0);" class="bookBtn booking_btn" style="background: linear-gradient(135deg, #1668E3 0%, #0d52d6 100%) !important; color: #ffffff !important; border-radius: 20px !important; font-weight: 700 !important; box-shadow: 0 4px 14px rgba(22, 104, 227, 0.35) !important;" data-id="@(k)">
+                                                        <span>Select</span> 
+                                                    </a>
                                                 </div>
 
                                             </div>
@@ -736,13 +678,13 @@
                                                                             @if (@flights.Airline.Code == "WN")
                                                                             {
                                                                                 <div class="airLogo">
-                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                                                 </div>
                                                                             }
                                                                             else if (@flights.Airline != null)
                                                                             {
                                                                         <div class="airLogo">
-                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                                         </div>
                                                                             }
                                                                             <div class="airName">@(flights.Airline.Code ?? "")-@(outboundArr.FlightNo) <span>@(outboundArr.Airline.Name)</span></div>
@@ -792,13 +734,13 @@
                                                                             @if (@flights.Airline.Code == "WN")
                                                                             {
                                                                                 <div class="airLogo">
-                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                                    <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                                                 </div>
                                                                             }
                                                                             else if (@flights.Airline != null)
                                                                             {
                                                                         <div class="airLogo">
-                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                            <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                                         </div>
                                                                             }
                                                                             <div class="airName">@(flights.Airline.Code ?? "")-@(inboundArr.FlightNo) <span>@(inboundArr.Airline.Name)</span></div>
@@ -854,30 +796,19 @@
                             if (flights.OutboundList.Count > 0)
                             {
                                 k++;
-                               <div class="fcard flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
+                               <div class="fcard flight_main flight_mainVal@(k)" data-id="@(flights.FlightId)" data-stop="@(outboundList.Count - 1)" data-loop="@(k)" data-airline="@(flights.Airline.Code ?? "")" data-newairline="@(flights.Airline.Code ?? "")" data-price="@(flights.TotalCost)">
                                    <input type="hidden" name="flight_id_@(k)" id="flight_id_@(k)" value="@(flights.FlightId)" />
 
                                    <div class="card-body">
 
                                        <input type="hidden" id="hfromflight_@(k)" name="hfromflight_@(k)" value="@(outboundList[0].SegmentRef)" data-stop="@(outboundList.Count - 1)" data-dept="@(outboundList[0].DepartureDate.ToString("HH:mm"))" />
-                                       <div class="airline-name">
-                                           @if (@flights.Airline.Code == "WN")
-                                           {
-                                               <div class="alogo">
-                                                   <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
-                                               </div>
-                                               <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
-                                           }
-                                           else if (@flights.Airline != null)
-                                           {
-                                       <div class="alogo">
-                                           <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
-                                          
-                                       </div>
-
-                                               <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
-                                           }
-                                       </div>
+                                        <div class="airline-name">
+                                            <div class="alogo">
+                                                <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + (flights.Airline != null ? flights.Airline.Code : "") + ".gif")" alt="@(flights.Airline != null ? flights.Airline.Name : "")" title="@(flights.Airline != null ? flights.Airline.Name : "")" width="17px" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';" />
+                                                <span class="fallback-airline-badge" style="display:none; width:22px; height:22px; border-radius:6px; background:#eff6ff; color:#1668E3; align-items:center; justify-content:center; font-size:11px;"><i class="fa fa-plane"></i></span>
+                                            </div>
+                                            <p>@(flights.Airline != null ? Common.UpperCaseWords(flights.Airline.Name) : "")</p>
+                                        </div>
 
                                        <div class="flight-main">
                                            <div class="flight-info">
@@ -897,12 +828,18 @@
 
                                            <div class="price-block">
                                                <div class="price-left">
-                                                   <div class="deals-lbl"> <a style="flex: 1; margin-block: auto !important; color: #508EEF !important;" href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn"><i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details</a></div>
+                                                   <div class="deals-lbl"> 
+                                                        <a href="javascript:void(0);" id="detailBtn" data-id="@(k)" class="resultBtn-detail detailBtn" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1668E3 !important; padding:4px 12px; border-radius:20px; font-size:11.5px !important; font-weight:700; text-decoration:none;">
+                                                            <i class="fa fa-info-circle" aria-hidden="true"></i>Flight Details
+                                                        </a>
+                                                    </div>
                                                    <input type="hidden" name="Prc_@(k)" id="Prc_@(k)" value="@(flights.TotalCost.ToString("0.00"))" />
                                                    <div class="pbig">$@(flights.TotalCost.ToString("0.00"))</div>
-                                                   <div class="psub">per person, return</div>
+                                                   <div class="psub">per person, one way</div>
                                                </div>
-                                               <a href="javascript:void(0);" class="bookBtn booking_btn" style="background-color: #6D52F1 !important;" data-id="@(k)"><span>Select</span> </a>
+                                               <a href="javascript:void(0);" class="bookBtn booking_btn" style="background: linear-gradient(135deg, #1668E3 0%, #0d52d6 100%) !important; color: #ffffff !important; border-radius: 20px !important; font-weight: 700 !important; box-shadow: 0 4px 14px rgba(22, 104, 227, 0.35) !important;" data-id="@(k)">
+                                                    <span>Select</span> 
+                                                </a>
                                                @*<a href="javascript:void(0);" style="width:fit-content;" class="btn-sel org bookBtn booking_btn" data-id="@(k)"><span>Select</span> </a>*@
                                                @*<button class="btn-sel org">Select &#8594;</button>*@
                                            </div>
@@ -934,13 +871,13 @@
                                                                @if (@flights.Airline.Code == "WN")
                                                                {
                                                                    <div class="airLogo">
-                                                                       <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                                       <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                                    </div>
                                                                }
                                                                else if (@flights.Airline != null)
                                                                {
                                                            <div class="airLogo">
-                                                               <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" />
+                                                               <img src="@("https://www.faresradar.com/" + "Content/airline/fit/" + flights.Airline.Code + ".gif")" title="@flights.Airline.Name" width="17px" onerror="this.style.display='none';" />
                                                            </div>
                                                                }
                                                                <div class="airName">@(outboundArr.Airline.Code)-@(outboundArr.FlightNo) <span>@(outboundArr.Airline.Name)</span></div>
@@ -990,21 +927,21 @@
         <div class="why-book-card">
             <div class="why-book-header">Why book with us?</div>
             <div class="why-book-item">
-                <div class="why-book-icon">🔒</div>
+                <div class="why-book-icon"><i class="fa fa-shield"></i></div>
                 <div class="why-book-content">
                     <div class="why-book-title">100% Secure Booking</div>
                     <div class="why-book-desc">SSL encrypted payments. Your data is always safe.</div>
                 </div>
             </div>
             <div class="why-book-item">
-                <div class="why-book-icon">📞</div>
+                <div class="why-book-icon"><i class="fa fa-phone"></i></div>
                 <div class="why-book-content">
                     <div class="why-book-title">24/7 Customer Support</div>
                     <div class="why-book-desc">Our travel experts are always a call away.</div>
                 </div>
             </div>
             <div class="why-book-item why-book-item--last">
-                <div class="why-book-icon">💲</div>
+                <div class="why-book-icon"><i class="fa fa-tag"></i></div>
                 <div class="why-book-content">
                     <div class="why-book-title">No Hidden Charges</div>
                     <div class="why-book-desc">The price you see is the price you pay, always.</div>
@@ -1014,7 +951,7 @@
     </aside>
 </div>
 
-        <!-- ═══════════════ MOBILE FILTER DRAWER ═══════════════ -->
+        <!-- --------------- MOBILE FILTER DRAWER --------------- -->
         <div class="filter-overlay" id="filterOverlay"></div>
         <div class="filter-drawer" id="filterDrawer">
             <div class="filter-drawer-header">
@@ -1074,10 +1011,10 @@
         <!-- Toast -->
         <div class="toast" id="toast"></div>
 
-        <!-- ═══════════════ FLIGHT DETAIL POPUP ═══════════════ -->
+        <!-- --------------- FLIGHT DETAIL POPUP --------------- -->
        
 
-        <!-- ═══════════════ airfareslookup CALENDAR MODAL ═══════════════ -->
+        <!-- --------------- airfareslookup CALENDAR MODAL --------------- -->
         <div class="cal-overlay" id="calOverlay"></div>
         <div class="cal-modal" id="calModal">
             <!-- Selection Summary Bar -->
@@ -1086,7 +1023,7 @@
                     <span class="cal-summary-label">Depart</span>
                     <span class="cal-summary-date" id="summaryDepart">Select date</span>
                 </div>
-                <span class="cal-summary-arrow">→</span>
+                <span class="cal-summary-arrow">&rarr;</span>
                 <div class="cal-summary-item">
                     <span class="cal-summary-label">Return</span>
                     <span class="cal-summary-date" id="summaryReturn">Select date</span>
@@ -1096,7 +1033,7 @@
             <div class="cal-tabs">
                 <button class="cal-tab active" id="tabSpecific">Specific dates</button>
                 <button class="cal-tab" id="tabFlexible">Flexible dates</button>
-                <button class="cal-close-btn" title="Close">✕</button>
+                <button class="cal-close-btn" title="Close">&times;</button>
             </div>
             <div class="cal-body" id="calBody">
                 <button class="cal-nav cal-prev">&#8249;</button>
@@ -1114,7 +1051,28 @@
 
 
 
-
+    }
+    else
+    {
+        <div class="container" style="max-width: 900px; margin: 40px auto; padding: 40px 20px; text-align: center;">
+            <div style="background: #ffffff; border-radius: 20px; padding: 50px 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #eff6ff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 24px; color: #2563eb; font-size: 32px;">
+                    <i class="fa-solid fa-plane-slash"></i>
+                </div>
+                <h2 style="font-size: 26px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">No Flights Found For This Route</h2>
+                <p style="font-size: 16px; color: #64748b; max-width: 550px; margin: 0 auto 30px; line-height: 1.6;">
+                    We couldn't find any available flights for your selected dates and route (@(ViewBag.fromName != null ? ViewBag.fromName : "Origin") &rarr; @(ViewBag.toName != null ? ViewBag.toName : "Destination")). Try searching with flexible dates or different nearby airports.
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="/" style="display: inline-block; background: #2563eb; color: #ffffff; font-weight: 600; font-size: 15px; padding: 14px 28px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
+                        <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Search Different Dates
+                    </a>
+                    <a href="tel:1-800-435-9792" style="display: inline-block; background: #f8fafc; color: #1e293b; font-weight: 600; font-size: 15px; padding: 14px 28px; border-radius: 10px; text-decoration: none; border: 1px solid #cbd5e1;">
+                        <i class="fa-solid fa-phone" style="margin-right: 8px; color: #2563eb;"></i> Call For Unpublished Deals
+                    </a>
+                </div>
+            </div>
+        </div>
     }
 
 
@@ -2061,17 +2019,238 @@ else
 
     <script>
         function expandSearch() {
-
             $("#skyExpanded").slideToggle(200);
-
             $("#toggleSearch i").toggleClass("fa-chevron-down fa-chevron-up");
         }
+
+        $(document).ready(function () {
+            // Initialize Datepickers
+            if ($.fn.datepicker) {
+                $("#flight_from_date").datepicker({
+                    dateFormat: "dd-mm-yy",
+                    minDate: 0,
+                    numberOfMonths: 1,
+                    onSelect: function (dateText) {
+                        try {
+                            var parts = dateText.split("-");
+                            var d = new Date(parts[2], parts[1] - 1, parts[0]);
+                            $("#flight_to_date").datepicker("option", "minDate", d);
+                        } catch (e) { }
+                    }
+                });
+
+                $("#flight_to_date").datepicker({
+                    dateFormat: "dd-mm-yy",
+                    minDate: 0,
+                    numberOfMonths: 1
+                });
+            }
+
+            // Toggle Trip Type Dropdown (Mutually exclusive with Traveller dropdown)
+            $("#tripTypeBtn").on("click", function (e) {
+                if ($(e.target).closest("#tripTypeDropdown").length) {
+                    return;
+                }
+                e.stopPropagation();
+                $("#travellerDropdown").removeClass("open");
+                $("#tripTypeDropdown").toggleClass("open");
+            });
+
+            // Toggle Traveller Dropdown (Mutually exclusive with Trip Type dropdown)
+            $("#travellerBtn").on("click", function (e) {
+                if ($(e.target).closest("#travellerDropdown").length) {
+                    return;
+                }
+                e.stopPropagation();
+                $("#tripTypeDropdown").removeClass("open");
+                $("#travellerDropdown").toggleClass("open");
+            });
+
+            // Prevent clicks inside traveller dropdown from closing it
+            $("#travellerDropdown").on("click", function (e) {
+                e.stopPropagation();
+            });
+
+            // Trip Type Radio Switch & Option Click
+            $(".sky-type-opt").on("click", function (e) {
+                e.stopPropagation();
+                var $radio = $(this).find('input[type="radio"]');
+                $radio.prop("checked", true);
+                var way = $radio.val();
+                if (way === "1") {
+                    $("#tripTypeLabel").text("One Way");
+                    $("#returnField").hide();
+                } else {
+                    $("#tripTypeLabel").text("Round Trip");
+                    $("#returnField").show();
+                }
+                $("#tripTypeDropdown").removeClass("open");
+            });
+
+            // Swap Origin and Destination
+            $("#swapAirport, .sky-swap-btn").on("click", function (e) {
+                e.preventDefault();
+                var fromVal = $("#flight_from").val();
+                var toVal = $("#flight_to").val();
+                $("#flight_from").val(toVal);
+                $("#flight_to").val(fromVal);
+                var $icon = $(this).find("i");
+                $icon.css({ transition: "transform 0.3s ease", transform: "rotate(180deg)" });
+                setTimeout(function () {
+                    $icon.css({ transition: "none", transform: "none" });
+                }, 300);
+            });
+
+            // Update Passenger Summary
+            function updatePassengerSummary() {
+                var adults = parseInt($("#flight_adult").val()) || 1;
+                var children = parseInt($("#flight_child").val()) || 0;
+                var infants = parseInt($("#flight_infant").val()) || 0;
+                var total = adults + children + infants;
+                var clsVal = $('input[name="flight_class"]:checked').val() || "4";
+                var clsName = "Economy";
+                if (clsVal === "1") clsName = "First";
+                else if (clsVal === "2") clsName = "Business";
+                else if (clsVal === "3") clsName = "Premium Economy";
+
+                var summary = total + " Traveller(s), " + clsName;
+                $("#pass_info").val(summary);
+                $("#pass_info_text").text(summary);
+            }
+
+            // Passenger Increment / Decrement
+            $(".inc_der").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                var fld = $(this).attr("data-field");
+                var opt = $(this).attr("data-opt");
+                var adt = parseInt($("#flight_adult").val()) || 1;
+                var chd = parseInt($("#flight_child").val()) || 0;
+                var inf = parseInt($("#flight_infant").val()) || 0;
+
+                if (fld === "adult") {
+                    if (opt === "+") {
+                        if (adt + chd < 9) adt++;
+                    } else if (opt === "-") {
+                        if (adt > 1) {
+                            adt--;
+                            if (inf > adt) inf = adt;
+                        }
+                    }
+                    $("#flight_adult").val(adt);
+                    $("#flight_infant").val(inf);
+                } else if (fld === "child") {
+                    if (opt === "+") {
+                        if (adt + chd < 9) chd++;
+                    } else if (opt === "-") {
+                        if (chd > 0) chd--;
+                    }
+                    $("#flight_child").val(chd);
+                } else if (fld === "infant") {
+                    if (opt === "+") {
+                        if (inf < adt) inf++;
+                    } else if (opt === "-") {
+                        if (inf > 0) inf--;
+                    }
+                    $("#flight_infant").val(inf);
+                }
+
+                updatePassengerSummary();
+            });
+
+            $(document).on("change", 'input[name="flight_class"]', function () {
+                updatePassengerSummary();
+            });
+
+            // Done Button closes Traveller Dropdown
+            $("#prsn_done").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                updatePassengerSummary();
+                $("#travellerDropdown").removeClass("open");
+            });
+
+            // Close dropdowns on outside click
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest("#tripTypeBtn").length) {
+                    $("#tripTypeDropdown").removeClass("open");
+                }
+                if (!$(e.target).closest("#travellerBtn").length) {
+                    $("#travellerDropdown").removeClass("open");
+                }
+            });
+
+            // Search Submission
+            $("#flight_submit").on("click", function (e) {
+                e.preventDefault();
+                var fromText = ($("#flight_from").val() || "").trim();
+                var toText = ($("#flight_to").val() || "").trim();
+
+                var fromCode = fromText;
+                if (fromText.indexOf("-") !== -1) {
+                    fromCode = fromText.split("-")[0].trim();
+                } else if (fromText.indexOf("(") !== -1) {
+                    var m = fromText.match(/\(([A-Z]{3})\)/i);
+                    if (m) fromCode = m[1];
+                }
+                fromCode = fromCode.substring(0, 3).toUpperCase();
+
+                var toCode = toText;
+                if (toText.indexOf("-") !== -1) {
+                    toCode = toText.split("-")[0].trim();
+                } else if (toText.indexOf("(") !== -1) {
+                    var m2 = toText.match(/\(([A-Z]{3})\)/i);
+                    if (m2) toCode = m2[1];
+                }
+                toCode = toCode.substring(0, 3).toUpperCase();
+
+                if (!fromCode || fromCode.length !== 3) {
+                    alert("Please select a valid origin airport.");
+                    $("#flight_from").focus();
+                    return;
+                }
+                if (!toCode || toCode.length !== 3) {
+                    alert("Please select a valid destination airport.");
+                    $("#flight_to").focus();
+                    return;
+                }
+                if (fromCode === toCode) {
+                    alert("Origin and destination cannot be the same airport.");
+                    return;
+                }
+
+                var depDate = $("#flight_from_date").val();
+                var retDate = $("#flight_to_date").val();
+                var fway = $('input[name="flight_way"]:checked').val() || "2";
+                if (fway === "1") retDate = "";
+
+                var adult = $("#flight_adult").val() || "1";
+                var child = $("#flight_child").val() || "0";
+                var infant = $("#flight_infant").val() || "0";
+                var fclass = $('input[name="flight_class"]:checked').val() || "4";
+
+                $("#search_popup").show();
+
+                var url = "/flight/search?From=" + encodeURIComponent(fromCode) +
+                    "&To=" + encodeURIComponent(toCode) +
+                    "&DepDate=" + encodeURIComponent(depDate) +
+                    "&RetDate=" + encodeURIComponent(retDate) +
+                    "&Adult=" + encodeURIComponent(adult) +
+                    "&Child=" + encodeURIComponent(child) +
+                    "&Infant=" + encodeURIComponent(infant) +
+                    "&FlightWay=" + encodeURIComponent(fway) +
+                    "&FlightClass=" + encodeURIComponent(fclass);
+
+                window.location.href = url;
+            });
+        });
     </script>
 
     <script src="/scripts/lodash.min.js"></script>
     <script src="/scripts/fuse.min.js"></script>
     <script src="/scripts/airports.js"></script>   
-    <script src="~/scripts/index.js"></script>
+    <script src="~/scripts/index.js?v=7"></script>
     <script src="~/css/file.js"></script>
     <script src="~/css/slide.js"></script>
    

@@ -108,7 +108,7 @@ form .radio label {
     font-size: 15px;
 }
 
-input,
+input:not([type="radio"]):not([type="checkbox"]),
 select,
 textarea {
     line-height: 1em !important;
@@ -343,11 +343,11 @@ form .form-control {
 }
 
 .BannerBg .col3 #flight_from {
-    background-image: url(/images/train-departure.png);
+    background-image: url(/images/departure.png);
 }
 
 .BannerBg .col3 #flight_to {
-    background-image: url(/images/train-departure.png);
+    background-image: url(/images/arrivals.png);
 }
 
 .BannerBg .col3 #from,
@@ -925,18 +925,19 @@ form .form-control {
  
        
 
-        table {
+        /* Content & Schedule Tables (excluding UI components) */
+        table:not(.ui-datepicker-calendar) {
             width: 100%;
 			margin: 30px 0 !important;
             border-collapse: collapse;
 			font-size: 20px !important;
         }
 
-        thead {
+        table:not(.ui-datepicker-calendar) thead {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         }
 
-        th {
+        table:not(.ui-datepicker-calendar) th {
             padding: 18px 20px !important;
             text-align: left;
             font-weight: 600;
@@ -947,7 +948,7 @@ form .form-control {
             position: relative;
         }
 
-        th:not(:last-child)::after {
+        table:not(.ui-datepicker-calendar) th:not(:last-child)::after {
             content: '';
             position: absolute;
             right: 0;
@@ -958,34 +959,33 @@ form .form-control {
             background: rgba(255, 255, 255, 0.2);
         }
 
-        tbody tr {
+        table:not(.ui-datepicker-calendar) tbody tr {
 			
             background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid rgb(0 0 0 / 7%);
             transition: all 0.3s ease;
         }
 
-        tbody tr:hover {
+        table:not(.ui-datepicker-calendar) tbody tr:hover {
             background: rgba(59, 130, 246, 0.1);
             transform: scale(1.01);
             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
         }
 
-        td {
+        table:not(.ui-datepicker-calendar) td {
             padding: 16px 20px !important;
             color: black;
             font-size: 14px;
         }
 
-       
         @media (max-width: 480px) {
-    table {
-            width: 100%;
-			margin: 30px 0 !important;
-            border-collapse: collapse;
-			font-size: 13px !important;
+            table:not(.ui-datepicker-calendar) {
+                width: 100%;
+			    margin: 30px 0 !important;
+                border-collapse: collapse;
+			    font-size: 13px !important;
+            }
         }
-  }
   
   
 ul {list-style-type: disc;}

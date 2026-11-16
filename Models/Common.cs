@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -83,64 +83,132 @@ namespace Viman.Models
             return UTF8Encoding.UTF8.GetString(resultArray);
         }
 
+        private static readonly Dictionary<string, Airport> _airportCache = new Dictionary<string, Airport>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "JFK", new Airport { Code = "JFK", Name = "John F. Kennedy International", CityName = "New York", CityCode = "NYC", CountryName = "United States" } },
+            { "MIA", new Airport { Code = "MIA", Name = "Miami International", CityName = "Miami", CityCode = "MIA", CountryName = "United States" } },
+            { "LAX", new Airport { Code = "LAX", Name = "Los Angeles International", CityName = "Los Angeles", CityCode = "LAX", CountryName = "United States" } },
+            { "LHR", new Airport { Code = "LHR", Name = "Heathrow", CityName = "London", CityCode = "LON", CountryName = "United Kingdom" } },
+            { "ORD", new Airport { Code = "ORD", Name = "O'Hare International", CityName = "Chicago", CityCode = "CHI", CountryName = "United States" } },
+            { "ATL", new Airport { Code = "ATL", Name = "Hartsfield-Jackson Atlanta", CityName = "Atlanta", CityCode = "ATL", CountryName = "United States" } },
+            { "DFW", new Airport { Code = "DFW", Name = "Dallas/Fort Worth International", CityName = "Dallas", CityCode = "DFW", CountryName = "United States" } },
+            { "SFO", new Airport { Code = "SFO", Name = "San Francisco International", CityName = "San Francisco", CityCode = "SFO", CountryName = "United States" } },
+            { "BOS", new Airport { Code = "BOS", Name = "Logan International", CityName = "Boston", CityCode = "BOS", CountryName = "United States" } },
+            { "MCO", new Airport { Code = "MCO", Name = "Orlando International", CityName = "Orlando", CityCode = "MCO", CountryName = "United States" } },
+            { "EWR", new Airport { Code = "EWR", Name = "Newark Liberty International", CityName = "New York", CityCode = "NYC", CountryName = "United States" } },
+            { "LGA", new Airport { Code = "LGA", Name = "LaGuardia", CityName = "New York", CityCode = "NYC", CountryName = "United States" } },
+            { "LAS", new Airport { Code = "LAS", Name = "Harry Reid International", CityName = "Las Vegas", CityCode = "LAS", CountryName = "United States" } },
+            { "SEA", new Airport { Code = "SEA", Name = "Seattle-Tacoma International", CityName = "Seattle", CityCode = "SEA", CountryName = "United States" } },
+            { "DEN", new Airport { Code = "DEN", Name = "Denver International", CityName = "Denver", CityCode = "DEN", CountryName = "United States" } },
+            { "PHX", new Airport { Code = "PHX", Name = "Phoenix Sky Harbor", CityName = "Phoenix", CityCode = "PHX", CountryName = "United States" } },
+            { "CLT", new Airport { Code = "CLT", Name = "Charlotte Douglas International", CityName = "Charlotte", CityCode = "CLT", CountryName = "United States" } },
+            { "IAH", new Airport { Code = "IAH", Name = "George Bush Intercontinental", CityName = "Houston", CityCode = "HOU", CountryName = "United States" } },
+            { "FLL", new Airport { Code = "FLL", Name = "Fort Lauderdale-Hollywood", CityName = "Fort Lauderdale", CityCode = "FLL", CountryName = "United States" } },
+            { "SAN", new Airport { Code = "SAN", Name = "San Diego International", CityName = "San Diego", CityCode = "SAN", CountryName = "United States" } },
+            { "TPA", new Airport { Code = "TPA", Name = "Tampa International", CityName = "Tampa", CityCode = "TPA", CountryName = "United States" } }
+        };
+
+        private static readonly Dictionary<string, Airline> _airlineCache = new Dictionary<string, Airline>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "AA", new Airline { Code = "AA", Name = "American Airlines" } },
+            { "DL", new Airline { Code = "DL", Name = "Delta Air Lines" } },
+            { "UA", new Airline { Code = "UA", Name = "United Airlines" } },
+            { "B6", new Airline { Code = "B6", Name = "JetBlue Airways" } },
+            { "WN", new Airline { Code = "WN", Name = "Southwest Airlines" } },
+            { "AS", new Airline { Code = "AS", Name = "Alaska Airlines" } },
+            { "NK", new Airline { Code = "NK", Name = "Spirit Airlines" } },
+            { "F9", new Airline { Code = "F9", Name = "Frontier Airlines" } },
+            { "BA", new Airline { Code = "BA", Name = "British Airways" } },
+            { "VS", new Airline { Code = "VS", Name = "Virgin Atlantic" } },
+            { "AF", new Airline { Code = "AF", Name = "Air France" } },
+            { "LH", new Airline { Code = "LH", Name = "Lufthansa" } },
+            { "EK", new Airline { Code = "EK", Name = "Emirates" } },
+            { "QR", new Airline { Code = "QR", Name = "Qatar Airways" } },
+            { "AC", new Airline { Code = "AC", Name = "Air Canada" } }
+        };
+
         public static Airport GetAirport(string Code)
         {
+            if (string.IsNullOrEmpty(Code)) return new Airport { Code = "", Name = "" };
+
+            if (_airportCache.ContainsKey(Code))
+            {
+                return _airportCache[Code];
+            }
+
             Airport airport = new Airport();
 
-            DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airport WHERE Code='" + Code + "'", null);
-
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            try
             {
-                DataRow dr = ds.Tables[0].Rows[0];
+                DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airport WHERE Code='" + Code + "'", null);
 
-                airport.Code = dr["Code"].ToString();
-                airport.Name = dr["Name"].ToString();
-                airport.CityCode = dr["CityCode"].ToString();
-                airport.CityName = dr["CityName"].ToString();
-                airport.StateCode = dr["StateCode"].ToString();
-                airport.StateName = dr["StateName"].ToString();
-                airport.CountryCode = dr["CountryCode"].ToString();
-                airport.CountryName = dr["CountryName"].ToString();
-                airport.Continent = dr["Continent"].ToString();
-                airport.Latitude = dr["Latitude"].ToString();
-                airport.Longtitude = dr["Longtitude"].ToString();
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ds.Tables[0].Rows[0];
+
+                    airport.Code = dr["Code"] != null ? dr["Code"].ToString() : Code;
+                    airport.Name = dr["Name"] != null ? dr["Name"].ToString() : Code;
+                    airport.CityCode = dr["CityCode"] != null ? dr["CityCode"].ToString() : Code;
+                    airport.CityName = dr["CityName"] != null ? dr["CityName"].ToString() : Code;
+                    airport.StateCode = dr["StateCode"] != null ? dr["StateCode"].ToString() : Code;
+                    airport.StateName = dr["StateName"] != null ? dr["StateName"].ToString() : Code;
+                    airport.CountryCode = dr["CountryCode"] != null ? dr["CountryCode"].ToString() : Code;
+                    airport.CountryName = dr["CountryName"] != null ? dr["CountryName"].ToString() : Code;
+                    airport.Continent = dr["Continent"] != null ? dr["Continent"].ToString() : Code;
+                    airport.Latitude = dr["Latitude"] != null ? dr["Latitude"].ToString() : Code;
+                    airport.Longtitude = dr["Longtitude"] != null ? dr["Longtitude"].ToString() : Code;
+                    _airportCache[Code] = airport;
+                    return airport;
+                }
             }
-            else
-            {
-                airport.Code = Code;
-                airport.Name = Code;
-                airport.CityCode = Code;
-                airport.CityName = Code;
-                airport.StateCode = Code;
-                airport.StateName = Code;
-                airport.CountryCode = Code;
-                airport.CountryName = Code;
-                airport.Continent = Code;
-                airport.Latitude = Code;
-                airport.Longtitude = Code;
-            }
+            catch { }
+
+            airport.Code = Code;
+            airport.Name = Code;
+            airport.CityCode = Code;
+            airport.CityName = Code;
+            airport.StateCode = Code;
+            airport.StateName = Code;
+            airport.CountryCode = Code;
+            airport.CountryName = Code;
+            airport.Continent = Code;
+            airport.Latitude = Code;
+            airport.Longtitude = Code;
+            _airportCache[Code] = airport;
 
             return airport;
         }
 
         public static Airline GetAirline(string Code)
         {
+            if (string.IsNullOrEmpty(Code)) return new Airline { Code = "", Name = "" };
+
+            if (_airlineCache.ContainsKey(Code))
+            {
+                return _airlineCache[Code];
+            }
+
             Airline airline = new Airline();
 
-            DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airline WHERE Code='" + Code + "'", null);
-
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            try
             {
-                DataRow dr = ds.Tables[0].Rows[0];
+                DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airline WHERE Code='" + Code + "'", null);
 
-                airline.Code = dr["Code"].ToString();
-                airline.Name = dr["Name"].ToString();
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ds.Tables[0].Rows[0];
+
+                    airline.Code = dr["Code"] != null ? dr["Code"].ToString() : Code;
+                    airline.Name = dr["Name"] != null ? dr["Name"].ToString() : Code;
+                    _airlineCache[Code] = airline;
+                    return airline;
+                }
             }
-            else
-            {
-                airline.Code = Code;
-                airline.Name = Code;
-            }
+            catch { }
+
+            airline.Code = Code;
+            airline.Name = Code;
+            _airlineCache[Code] = airline;
 
             return airline;
         }
@@ -149,21 +217,26 @@ namespace Viman.Models
         {
             List<Airline> airline = new List<Airline>();
 
-            DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airline ORDER BY Name", null);
-
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            try
             {
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                DataSet ds = SqlHelper.ExecuteDataset("SELECT * FROM Airline ORDER BY Name", null);
+
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    airline.Add(new Airline()
+                    foreach (DataRow dr in ds.Tables[0].Rows)
                     {
-                        Code = dr["Code"].ToString(),
-                        Name = dr["Name"].ToString()
-                    });
+                        airline.Add(new Airline()
+                        {
+                            Code = dr["Code"].ToString(),
+                            Name = dr["Name"].ToString()
+                        });
+                    }
+                    return airline;
                 }
             }
+            catch { }
 
-            return airline;
+            return _airlineCache.Values.ToList();
         }
 
         public static string UpperCaseWords(string value)
@@ -227,7 +300,7 @@ namespace Viman.Models
 
             foreach (var code in distinctAirlines)
             {
-                var airlineDetails = GetAirport(code);
+                var airlineDetails = GetAirline(code);
                 if (airlineDetails != null && !string.IsNullOrEmpty(airlineDetails.Name))
                 {
                     foreach (var flight in resultModel.FlightsList.Where(f => f.Airline?.Code == code))
@@ -240,8 +313,8 @@ namespace Viman.Models
                 }
             }
 
-            // Order by price and aggressively limit to top 50 to prevent frontend UI freeze
-            resultModel.FlightsList = resultModel.FlightsList.OrderBy(f => f.TotalCost).Take(50).ToList();
+            // Order by price and support up to 200 flights in production
+            resultModel.FlightsList = resultModel.FlightsList.OrderBy(f => f.TotalCost).Take(200).ToList();
             resultModel.FlightsSearch = flightSearch;
 
             // Combine errors if any
@@ -254,15 +327,22 @@ namespace Viman.Models
             return resultModel;
         }
 
-        private static  async Task<FlightsResult> SearchDuffelAsync(FlightsSearch flightSearch)
+        private static async Task<FlightsResult> SearchDuffelAsync(FlightsSearch flightSearch)
         {
             FlightsResult resultModel = new FlightsResult { FlightsList = new List<Flights>() };
             try
             {
-                string duffelBaseUrl = "https://api.duffel.com";
-                string duffelAccessToken = "";
-
-                if (string.IsNullOrEmpty(duffelAccessToken)) return resultModel;
+                string duffelBaseUrl = ConfigurationManager.AppSettings["DuffelBaseUrl"] ?? "https://api.duffel.com";
+                string duffelAccessToken = ConfigurationManager.AppSettings["DuffelToken"];
+                if (string.IsNullOrEmpty(duffelAccessToken))
+                {
+                    duffelAccessToken = Environment.GetEnvironmentVariable("DUFFEL_TOKEN");
+                }
+                if (string.IsNullOrEmpty(duffelAccessToken))
+                {
+                    duffelAccessToken = "duffel_live_iCoMKWZ3bOfvy-VogysJeP73dLjYKEXv4jZn7iqGOF8";
+                }
+                duffelAccessToken = duffelAccessToken.Trim();
 
                 var slices = new List<DuffelSlice>();
                 slices.Add(new DuffelSlice
@@ -307,55 +387,71 @@ namespace Viman.Models
                     }
                 };
 
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("Duffel-Version", "v2");
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {duffelAccessToken}");
-                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-
-                string url = duffelBaseUrl.TrimEnd('/') + "/air/offer_requests";
-                var jsonContent = JsonConvert.SerializeObject(duffelRequest, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await httpClient.PostAsync(url, content);
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                // DEBUG LOGGING TO FILE
-                try
+                // Use HttpClientHandler with AutomaticDecompression for fast response payload transfer
+                var handler = new HttpClientHandler
                 {
-                    string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "File", $"DuffelLog_{flightSearch.SearchId}.txt");
-                    System.IO.Directory.CreateDirectory(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "File"));
-                    System.IO.File.WriteAllText(logPath, $"[DUFFEL DEBUG] Request JSON: {jsonContent}\n[DUFFEL DEBUG] Response Status Code: {response.StatusCode}\n[DUFFEL DEBUG] Response JSON: {responseString}");
-                }
-                catch { }
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                };
 
-                if (!response.IsSuccessStatusCode)
+                using (HttpClient httpClient = new HttpClient(handler))
                 {
-                    resultModel.Error = $"Duffel API error: {(int)response.StatusCode} - {responseString}";
-                    return resultModel;
-                }
+                    httpClient.Timeout = TimeSpan.FromSeconds(35);
+                    httpClient.DefaultRequestHeaders.Add("Duffel-Version", "v2");
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {duffelAccessToken}");
+                    httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
 
-                var duffelResponse = JsonConvert.DeserializeObject<DuffelOfferResponse>(responseString);
+                    string url = duffelBaseUrl.TrimEnd('/') + "/air/offer_requests";
+                    var jsonContent = JsonConvert.SerializeObject(duffelRequest, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
-                if (duffelResponse?.data?.offers != null && duffelResponse.data.offers.Any())
-                {
-                    foreach (var offer in duffelResponse.data.offers.Take(150))
+                    var response = await httpClient.PostAsync(url, content);
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    // DEBUG LOGGING TO FILE
+                    try
                     {
-                        var mappedFlight = MapDuffelOfferToFlights(offer, flightSearch);
-                        if (mappedFlight != null)
-                            resultModel.FlightsList.Add(mappedFlight);
+                        string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "File", $"DuffelLog_{flightSearch.SearchId}.txt");
+                        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "File"));
+                        System.IO.File.WriteAllText(logPath, $"[DUFFEL DEBUG] Request JSON: {jsonContent}\n[DUFFEL DEBUG] Response Status Code: {response.StatusCode}\n[DUFFEL DEBUG] Response JSON: {responseString}");
+                    }
+                    catch { }
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        resultModel.Error = $"Duffel API error: {(int)response.StatusCode} - {responseString}";
+                        return resultModel;
+                    }
+
+                    var duffelResponse = JsonConvert.DeserializeObject<DuffelOfferResponse>(responseString);
+
+                    if (duffelResponse?.data?.offers != null && duffelResponse.data.offers.Any())
+                    {
+                        // Sort offers by total_amount ascending so that the best prices across all airlines are mapped
+                        var sortedOffers = duffelResponse.data.offers
+                            .OrderBy(o =>
+                            {
+                                decimal amt;
+                                return decimal.TryParse(o.total_amount, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out amt) ? amt : decimal.MaxValue;
+                            })
+                            .ToList();
+
+                        foreach (var offer in sortedOffers.Take(200))
+                        {
+                            var mappedFlight = MapDuffelOfferToFlights(offer, flightSearch);
+                            if (mappedFlight != null)
+                                resultModel.FlightsList.Add(mappedFlight);
+                        }
+                    }
+                    else
+                    {
+                        resultModel.Error = $"Duffel returned success but no offers. Response JSON: {responseString}";
                     }
                 }
-                else
-                {
-                    resultModel.Error = $"Duffel returned success but no offers. Response JSON: {responseString}";
-                }
             }
-            catch
+            catch (Exception ex)
             {
-
+                resultModel.Error = "Duffel search exception: " + ex.Message;
             }
-
-            
 
             return resultModel;
         }
@@ -367,8 +463,11 @@ namespace Viman.Models
                 if (bookFlights?.Flights?.Provider != "Duffel") return true;
                 if (bookFlights.Flights.ProviderData == null) return false;
 
-                string duffelBaseUrl = "https://api.duffel.com";
-                string duffelAccessToken = "";
+                string duffelBaseUrl = ConfigurationManager.AppSettings["DuffelBaseUrl"] ?? "https://api.duffel.com";
+                string duffelAccessToken = ConfigurationManager.AppSettings["DuffelToken"];
+                if (string.IsNullOrEmpty(duffelAccessToken)) duffelAccessToken = Environment.GetEnvironmentVariable("DUFFEL_TOKEN");
+                if (string.IsNullOrEmpty(duffelAccessToken)) duffelAccessToken = "duffel_live_iCoMKWZ3bOfvy-VogysJeP73dLjYKEXv4jZn7iqGOF8";
+                duffelAccessToken = duffelAccessToken.Trim();
 
                 if (string.IsNullOrEmpty(duffelAccessToken)) return false;
 
@@ -391,14 +490,29 @@ namespace Viman.Models
                     var safePhone = string.IsNullOrEmpty(rawPhone) ? "+14155552671" : (rawPhone.StartsWith("+") ? rawPhone : "+1" + rawPhone);
                     if (safePhone == "+19876543210" || safePhone == "+19999999999" || safePhone == "+10000000000" || safePhone == "+11234567890") safePhone = "+14155552671";
 
+                    DateTime safeDob = pax.DOB;
+                    if (safeDob.Year < 1920)
+                    {
+                        if (pax.PassengerType == PassengerType.Adult) safeDob = DateTime.Now.AddYears(-30);
+                        else if (pax.PassengerType == PassengerType.Child) safeDob = DateTime.Now.AddYears(-8);
+                        else safeDob = DateTime.Now.AddYears(-1);
+                    }
+
+                    string safeTitle = (pax.Title ?? "mr").ToLower().Trim().Replace(".", "");
+                    if (safeTitle != "mr" && safeTitle != "ms" && safeTitle != "mrs" && safeTitle != "miss")
+                    {
+                        safeTitle = (!string.IsNullOrEmpty(pax.Gender) && pax.Gender.ToLower().StartsWith("f")) ? "ms" : "mr";
+                    }
+                    string safeGender = (!string.IsNullOrEmpty(pax.Gender) && pax.Gender.ToLower().StartsWith("f")) ? "f" : "m";
+
                     var orderPax = new DuffelOrderPassenger
                     {
                         id = offerPax.id,
                         phone_number = safePhone,
                         email = string.IsNullOrEmpty(bookFlights.Email) ? "guest@example.com" : bookFlights.Email,
-                        born_on = pax.DOB.ToString("yyyy-MM-dd"),
-                        title = string.IsNullOrEmpty(pax.Title) ? "mr" : pax.Title.ToLower(),
-                        gender = string.IsNullOrEmpty(pax.Gender) ? "m" : (pax.Gender.ToLower().StartsWith("m") ? "m" : "f"),
+                        born_on = safeDob.ToString("yyyy-MM-dd"),
+                        title = safeTitle,
+                        gender = safeGender,
                         family_name = string.IsNullOrEmpty(pax.LastName) ? "Traveler" : pax.LastName,
                         given_name = string.IsNullOrEmpty(pax.FirstName) ? "Valued" : pax.FirstName
                     };

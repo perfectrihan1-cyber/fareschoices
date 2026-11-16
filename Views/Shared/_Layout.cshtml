@@ -1,4 +1,4 @@
-﻿@using Viman.Models
+@using Viman.Models
 @{
     Func<string, string> Static = path => ViewBag.StaticURL + path;
 }
@@ -42,15 +42,16 @@
     <link href="/fontawesome/css/all.min.css" rel="stylesheet">
     <link href="/Content/flcss/bootstrap.min.css" rel="stylesheet" />
     <link href="/Content/flcss/home.css" rel="stylesheet" />
-    <link href="/Content/flcss/inner.css" rel="stylesheet" />
+    <link href="/Content/flcss/inner.css?v=29" rel="stylesheet" />
     <link href="/Content/flcss/animated.css" rel="stylesheet" />
     <link href="/Content/flcss/common.css" rel="stylesheet" />
     <link href="/Content/flcss/jquery-ui.min.css" rel="stylesheet" />
     <link href="/Content/flcss/owl.theme.default.css" rel="stylesheet" />
     <link href="/Content/flcss/owl.carousel.css" rel="stylesheet" type="text/css" />
     <link href="/Content/flcss/owl.carousel.min.css" rel="stylesheet" type="text/css" />
-    <link href="/Content/searchAirport.css" rel="stylesheet" />
+    <link href="/Content/searchAirport.css?v=29" rel="stylesheet" />
     <link href="/Content/jquery-ui.css" rel="stylesheet" />
+    <link href="/css1/fareschoices.css?v=29" rel="stylesheet" />
     <script src="~/Content/fljs/jquery-3.7.0.min.js"></script>
     <script src="~/Content/fljs/jquery-ui.min.js"></script>
     <script src="~/Content/fljs/bootstrap.min.js"></script>
@@ -65,27 +66,81 @@
         @{Html.RenderPartial("~/Views/Shared/footer.cshtml");}
         @RenderSection("Scripts", required: false)
 
-        <div class="NewFLightLoader" id="search_popup" style="display: none;">
-            <div class="loadingloader">
-                <img src="/images/Circle.png" width="250px" />
+        <div class="NewFLightLoader" id="search_popup" style="display: none !important;">
+            <div class="flight-loader-modal">
+                <div class="flight-loader-radar">
+                    <div class="radar-spinner"></div>
+                    <div class="radar-pulse"></div>
+                    <div class="radar-plane">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                </div>
+
+                <div class="flight-loader-header">
+                    <h3>Searching for the best deals...</h3>
+                    <p>Comparing 500+ airlines to find the lowest fares</p>
+                </div>
+
+                <div class="flight-loader-route-card">
+                    <div class="route-airports">
+                        <div class="airport origin">
+                            <span class="airport-code" id="spFrom">--</span>
+                        </div>
+                        <div class="route-flight-path">
+                            <span class="path-line"></span>
+                            <span class="path-plane"><i class="fa-solid fa-plane"></i></span>
+                            <span class="path-line"></span>
+                        </div>
+                        <div class="airport destination">
+                            <span class="airport-code" id="spTo">--</span>
+                        </div>
+                    </div>
+
+                    <div class="route-meta">
+                        <div class="meta-item route-dates" id="pnlDates">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            <span id="spFromDate"></span>
+                            <span id="spFLightway" class="date-arrow">&rarr;</span>
+                            <span id="spToDate"></span>
+                        </div>
+                        <div class="meta-item route-pax">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span><strong id="spADT">1</strong> Adult(s), <strong id="spCHD">0</strong> Child(ren), <strong id="spINF">0</strong> Infant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flight-loader-bar">
+                    <div class="flight-loader-bar-fill"></div>
+                </div>
+                <span class="flight-loader-hint">Please wait while we connect to reservation systems...</span>
             </div>
-            <p>Searching for the best deals for you...</p>
-            <h4>
-                <span id="spFrom"></span> <span id="spFLightway">-</span> <span id="spTo"></span>
-            </h4>
-            <h4>
-                <span id="spFromDate"></span> <span id="spFLightway">-</span> <span id="spToDate"></span>
-            </h4>
-            <p>
-                <strong id="spADT"></strong> Adult(s),
-                <strong id="spCHD">0</strong> Child(ren),
-                <strong id="spINF">0</strong> Infant
-            </p>
         </div>
     </div>
 
         <script type="text/javascript">
         $(document).ready(function () {
+            $("#search_popup").removeClass("is-active").hide();
+
+            // Pre-populate default dates: Depart in 7 days, Return in 14 days
+            var _today = new Date();
+            var _dep = new Date();
+            _dep.setDate(_today.getDate() + 7);
+            var _ret = new Date();
+            _ret.setDate(_today.getDate() + 14);
+
+            function _padZero(n) { return (n < 10 ? '0' : '') + n; }
+            function _fmtDate(d) {
+                return _padZero(d.getDate()) + '-' + _padZero(d.getMonth() + 1) + '-' + d.getFullYear();
+            }
+
+            if (!$("#flight_from_date").val()) {
+                $("#flight_from_date").val(_fmtDate(_dep));
+            }
+            if (!$("#flight_to_date").val()) {
+                $("#flight_to_date").val(_fmtDate(_ret));
+            }
+
             $(function () {
                 $("#flight_from_date").datepicker({
                     minDate: '+0D',
@@ -155,24 +210,43 @@
                     $("#flight_to").focus();
                     return false;
                 }
+                else if (!$("#flight_from_date").val() || $("#flight_from_date").val().trim() == "") {
+                    alert("Please select departure date");
+                    $("#flight_from_date").focus();
+                    return false;
+                }
+                else if ($('input[name=flight_way]:checked').val() == "2" && (!$("#flight_to_date").val() || $("#flight_to_date").val().trim() == "")) {
+                    alert("Please select return date");
+                    $("#flight_to_date").focus();
+                    return false;
+                }
                 else {
                     var fway = $('input[name=flight_way]:checked').val();
                     var fcls = $('input[name=flight_class]:checked').val();
-                    var from = "&From=" + $("#flight_from").val().split("-")[0];
-                    var to = "&To=" + $("#flight_to").val().split("-")[0];
+                    var from = "&From=" + $("#flight_from").val().split("-")[0].trim();
+                    var to = "&To=" + $("#flight_to").val().split("-")[0].trim();
                     var fromDate = "&DepDate=" + $("#flight_from_date").val().split("-")[2] + "-" + $("#flight_from_date").val().split("-")[1] + "-" + $("#flight_from_date").val().split("-")[0];
                     var toDate = "&RetDate=";
-                    $("#spFrom").text($("#flight_from").val().split("-")[0]);
-                    $("#spTo").text($("#flight_to").val().split("-")[0]);
-                    $("#spFromDate").text($("#flight_from_date").val());
+                    $("#spFrom").text($("#flight_from").val().split("-")[0].trim());
+                    $("#spTo").text($("#flight_to").val().split("-")[0].trim());
+                    
+                    if ($("#flight_from_date").val()) {
+                        $("#spFromDate").text($("#flight_from_date").val());
+                        $("#pnlDates").show();
+                    } else {
+                        $("#pnlDates").hide();
+                    }
+
                     $("#spFLightway").hide();
 
                     if (fway == "2") {
                         toDate = "&RetDate=" + $("#flight_to_date").val().split("-")[2] + "-" + $("#flight_to_date").val().split("-")[1] + "-" + $("#flight_to_date").val().split("-")[0];
-                        $("#spToDate").text($("#flight_to_date").val());
-                        $("#spTo2").text($("#flight_from").val().split("-")[0]);
-                        $("#spFrom2").text($("#flight_to").val().split("-")[0]);
-                        $("#spFLightway").show();
+                        if ($("#flight_to_date").val()) {
+                            $("#spToDate").text($("#flight_to_date").val());
+                            $("#spFLightway").show();
+                        }
+                    } else {
+                        $("#spToDate").text("");
                     }
 
                     var adultCount = (parseInt($("#flight_adult").val()) || 0) + (parseInt($("#flight_ss").val()) || 0);
@@ -195,7 +269,7 @@
                     var tolPass = $("#ddlAdult").val() + "Adult," + $("#ddlChild").val() + "Child," + $("#ddlInfant").val() +"Infant";
                     $("#spPass").text(tolPass);
                     var str = "/flight/search?SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=USD";
-                    $("#search_popup").show();
+                    $("#search_popup").addClass("is-active").show();
                     window.location = str;
                 }
             });
@@ -217,9 +291,12 @@
                 if (fway == "2") {
                         toDate = "&RetDate=" + $("#flight_to_date" + flight_opt).val().split("-")[2] + "-" + $("#flight_to_date" + flight_opt).val().split("-")[1] + "-" + $("#flight_to_date" + flight_opt).val().split("-")[0];
                     $("#spToDate").text($("#flight_to_date" + flight_opt).val());
-                    $("#spToDate").text($("#flight_to_date" + flight_opt).val());
                     $("#spTo2").text($("#flight_from" + flight_opt).val());
                     $("#spFrom2").text($("#flight_to" + flight_opt).val());
+                    $("#spFLightway").show();
+              } else {
+                    $("#spToDate").text("");
+                    $("#spFLightway").hide();
               }
                 var adult = "&Adult=" + 1;
                 var child = "&Child=" + 0;
@@ -234,9 +311,9 @@
               $("#spINF").text($("#flight_infant").val());
                 var tolPass =  1 + "Adult" ;
                 $("#spPass").text(tolPass);
-              var str = "@(ViewBag.WebsiteURL + "flight/search?")SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=USD";
-                      $("#search_popup").show();
-                      window.location = str;
+                var str = "/flight/search?SiteCode=VIMAN&SourceMedia=VIMAN" + from + to + fromDate + toDate + adult + child + infant + fway_s + fcls_s + airline + isdirect + isflexi + "&Currency=USD";
+                $("#search_popup").addClass("is-active").show();
+                window.location = str;
  });
         </script>
 

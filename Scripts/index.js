@@ -134,14 +134,26 @@ var options = {
     }]
 };
 
-var fuse = new Fuse(airports, options)
+var fuse;
+if (typeof Fuse !== 'undefined' && typeof airports !== 'undefined') {
+    fuse = new Fuse(airports, options);
+}
 
+// Global safety fallbacks for legacy inline handlers
+window.checkdata = window.checkdata || function () {};
+window.checkdata1 = window.checkdata1 || function () {};
 
+var isSelecting = false;
+var isSelecting_to = false;
+
+// ═════════════════════════════════════════════════════════════════
+// DEPARTURE (FROM) AUTOCOMPLETE
+// ═════════════════════════════════════════════════════════════════
 var ac = $('.autocomplete_from')
     .on('click', function (e) {
         e.stopPropagation();
     })
-    .on('focus keyup', search)
+    .on('focus keyup input', search)
     .on('keydown', onKeyDown);
 
 var wrap = $('<div>')
@@ -151,103 +163,173 @@ var wrap = $('<div>')
 
 var list = $('<div>')
     .addClass('autocomplete-results')
+    .hide()
+    .on('mousedown', function (e) {
+        // Prevent input blur before click executes
+        e.preventDefault();
+    })
     .on('click', '.autocomplete-result', function (e) {
         e.preventDefault();
         e.stopPropagation();
         selectIndex($(this).data('index'));
-        //ankit
     })
-    .appendTo(wrap);
-
-$(document)
-    .on('mouseover', '.autocomplete-result', function (e) {
-        var index = parseInt($(this).data('index'), 10);
-        if (!isNaN(index)) {
-            list.attr('data-highlight', index);
+    .on('mouseenter', '.autocomplete-result', function () {
+        var idx = parseInt($(this).data('index'), 10);
+        if (!isNaN(idx)) {
+            selectedIndex = idx;
+            list.find('.autocomplete-result').removeClass('highlighted');
+            $(this).addClass('highlighted');
+            list.attr('data-highlight', idx);
         }
     })
-    .on('click', clearResults);
-
-function clearResults() {
-    results = [];
-    numResults = 0;
-    list.empty();
-}
-
-function selectIndex(index) {
-    if (results.length >= index + 1) {
-        ac.val(results[index].iata + "-" + results[index].name + " " + results[index].city);
-        clearResults();
-    }
-}
+    .appendTo(wrap);
 
 var results = [];
 var numResults = 0;
 var selectedIndex = -1;
 
+function clearResults() {
+    results = [];
+    numResults = 0;
+    selectedIndex = -1;
+    list.empty().removeAttr('data-highlight').removeClass('open').hide();
+}
+
+function selectIndex(index) {
+    var idx = parseInt(index, 10);
+    if (results && results.length > idx && idx >= 0) {
+        var r = results[idx];
+        var valStr = r.iata + "-" + r.name + " " + r.city;
+        isSelecting = true;
+        clearResults();
+        ac.val(valStr);
+        try { ac.trigger('change'); } catch (err) { console.warn(err); }
+        setTimeout(function () { isSelecting = false; }, 350);
+        if (typeof ac_to !== 'undefined' && ac_to.length && !ac_to.val().trim()) {
+            setTimeout(function () { ac_to.focus(); }, 80);
+        }
+    } else {
+        clearResults();
+    }
+}
+
 function search(e) {
-    if (e.which === 38 || e.which === 13 || e.which === 40) {
+    if (isSelecting) return;
+
+    if (!fuse) {
+        if (typeof Fuse !== 'undefined' && typeof airports !== 'undefined') {
+            fuse = new Fuse(airports, options);
+        } else {
+            return;
+        }
+    }
+
+    if (e.which === 38 || e.which === 13 || e.which === 40 || e.which === 27 || e.which === 9) {
         return;
     }
 
-    if (ac.val().length > 0) {
-        results = _.take(fuse.search(ac.val()), 7);
+    clearResults_to();
+
+    var q = ac.val().trim();
+
+    // If focus event and value is already a chosen airport, don't reopen dropdown
+    if (e && e.type === 'focus' && q.indexOf('-') !== -1 && q.length > 5) {
+        return;
+    }
+
+    if (q.length > 0) {
+        results = _.take(fuse.search(q), 8);
         numResults = results.length;
+
+        if (numResults === 0) {
+            list.html('<div style="padding:14px;color:#64748b;font-size:13px;text-align:center;"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;color:#94a3b8;"></i>No airports found for "' + $('<div>').text(q).html() + '"</div>')
+                .addClass('open')
+                .show();
+            return;
+        }
 
         var divs = results.map(function (r, i) {
             return '<div class="autocomplete-result" data-index="' + i + '">' +
-                '<div><b>' + r.iata + '</b> - ' + r.name + '</div>' +
-                '<div class="autocomplete-location">' + r.city + ', ' + r.country + '</div>' +
+                '<div class="ac-icon"><i class="fa-solid fa-plane-departure"></i></div>' +
+                '<div class="ac-details">' +
+                    '<div class="ac-title"><span class="ac-code-inline">' + r.iata + '</span> &middot; ' + r.name + '</div>' +
+                    '<div class="ac-location"><i class="fa-solid fa-location-dot" style="font-size:10px;margin-right:5px;opacity:0.7;"></i>' + r.city + (r.country ? ', ' + r.country : '') + '</div>' +
+                '</div>' +
+                '<div class="ac-iata-pill">' + r.iata + '</div>' +
                 '</div>';
         });
 
         selectedIndex = -1;
         list.html(divs.join(''))
-            .attr('data-highlight', selectedIndex);
+            .attr('data-highlight', selectedIndex)
+            .addClass('open')
+            .show();
 
     } else {
-        numResults = 0;
-        list.empty();
+        clearResults();
     }
 }
 
 function onKeyDown(e) {
+    if (e.which === 27) {
+        clearResults();
+        e.stopPropagation();
+        return;
+    }
+
+    if (numResults === 0) return;
+
     switch (e.which) {
-        case 38: // up
+        case 38: // up arrow
             selectedIndex--;
-            if (selectedIndex <= -1) {
-                selectedIndex = -1;
-            }
-            list.attr('data-highlight', selectedIndex);
-            break;
-        case 13: // enter
-            selectIndex(selectedIndex);
-            break;
-        case 9: // enter
-            selectIndex(selectedIndex);
-            e.stopPropagation();
-            return;
-        case 40: // down
-            selectedIndex++;
-            if (selectedIndex >= numResults) {
+            if (selectedIndex < 0) {
                 selectedIndex = numResults - 1;
             }
-            list.attr('data-highlight', selectedIndex);
+            updateHighlight(list, selectedIndex);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+
+        case 40: // down arrow
+            selectedIndex++;
+            if (selectedIndex >= numResults) {
+                selectedIndex = 0;
+            }
+            updateHighlight(list, selectedIndex);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+
+        case 13: // Enter
+        case 9:  // Tab
+            if (selectedIndex >= 0 && selectedIndex < numResults) {
+                selectIndex(selectedIndex);
+                if (e.which === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else if (numResults > 0) {
+                selectIndex(0);
+                if (e.which === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
             break;
 
         default:
-            return; // exit this handler for other keys
+            return;
     }
-    e.stopPropagation();
-    e.preventDefault(); // prevent the default action (scroll / move caret)
 }
 
-
-var ac_to = $('.autocomplete_to') //here
+// ═════════════════════════════════════════════════════════════════
+// ARRIVAL (TO) AUTOCOMPLETE
+// ═════════════════════════════════════════════════════════════════
+var ac_to = $('.autocomplete_to')
     .on('click', function (e) {
         e.stopPropagation();
     })
-    .on('focus keyup', search_to)
+    .on('focus keyup input', search_to)
     .on('keydown', onKeyDown_to);
 
 var wrap_to = $('<div>')
@@ -257,92 +339,194 @@ var wrap_to = $('<div>')
 
 var list_to = $('<div>')
     .addClass('autocomplete-results_to')
+    .hide()
+    .on('mousedown', function (e) {
+        // Prevent input blur before click executes
+        e.preventDefault();
+    })
     .on('click', '.autocomplete-result', function (e) {
         e.preventDefault();
         e.stopPropagation();
         selectIndex_to($(this).data('index'));
     })
-    .appendTo(wrap_to);
-
-$(document)
-    .on('mouseover', '.autocomplete-result', function (e) {
-        var index = parseInt($(this).data('index'), 10);
-        if (!isNaN(index)) {
-            list_to.attr('data-highlight', index);
+    .on('mouseenter', '.autocomplete-result', function () {
+        var idx = parseInt($(this).data('index'), 10);
+        if (!isNaN(idx)) {
+            selectedIndex_to = idx;
+            list_to.find('.autocomplete-result').removeClass('highlighted');
+            $(this).addClass('highlighted');
+            list_to.attr('data-highlight', idx);
         }
     })
-    .on('click', clearResults_to);
+    .appendTo(wrap_to);
+
+var results_to = [];
+var numResults_to = 0;
+var selectedIndex_to = -1;
 
 function clearResults_to() {
-    results = [];
-    numResults = 0;
-    list_to.empty();
+    results_to = [];
+    numResults_to = 0;
+    selectedIndex_to = -1;
+    list_to.empty().removeAttr('data-highlight').removeClass('open').hide();
 }
 
-function selectIndex_to(index) { //here
-    if (results.length >= index + 1) {
-        ac_to.val(results[index].iata + "-" + results[index].name + " " + results[index].city);
+function selectIndex_to(index) {
+    var idx = parseInt(index, 10);
+    if (results_to && results_to.length > idx && idx >= 0) {
+        var r = results_to[idx];
+        var valStr = r.iata + "-" + r.name + " " + r.city;
+        isSelecting_to = true;
+        clearResults_to();
+        ac_to.val(valStr);
+        try { ac_to.trigger('change'); } catch (err) { console.warn(err); }
+        setTimeout(function () { isSelecting_to = false; }, 350);
+        var depDate = $('#flight_from_date');
+        if (depDate.length && !depDate.val().trim()) {
+            setTimeout(function () { depDate.datepicker('show'); }, 80);
+        }
+    } else {
         clearResults_to();
     }
 }
 
-var results = [];
-var numResults = 0;
-var selectedIndex = -1;
-
 function search_to(e) {
-    if (e.which === 38 || e.which === 13 || e.which === 40) {
+    if (isSelecting_to) return;
+
+    if (!fuse) {
+        if (typeof Fuse !== 'undefined' && typeof airports !== 'undefined') {
+            fuse = new Fuse(airports, options);
+        } else {
+            return;
+        }
+    }
+
+    if (e.which === 38 || e.which === 13 || e.which === 40 || e.which === 27 || e.which === 9) {
         return;
     }
 
-    if (ac_to.val().length > 0) {
-        results = _.take(fuse.search(ac_to.val()), 7);
-        numResults = results.length;
+    clearResults();
 
-        var divs = results.map(function (r, i) {
+    var q = ac_to.val().trim();
+
+    // If focus event and value is already a chosen airport, don't reopen dropdown
+    if (e && e.type === 'focus' && q.indexOf('-') !== -1 && q.length > 5) {
+        return;
+    }
+
+    if (q.length > 0) {
+        results_to = _.take(fuse.search(q), 8);
+        numResults_to = results_to.length;
+
+        if (numResults_to === 0) {
+            list_to.html('<div style="padding:14px;color:#64748b;font-size:13px;text-align:center;"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;color:#94a3b8;"></i>No airports found for "' + $('<div>').text(q).html() + '"</div>')
+                .addClass('open')
+                .show();
+            return;
+        }
+
+        var divs = results_to.map(function (r, i) {
             return '<div class="autocomplete-result" data-index="' + i + '">' +
-                '<div><b>' + r.iata + '</b> - ' + r.name + '</div>' +
-                '<div class="autocomplete-location">' + r.city + ', ' + r.country + '</div>' +
+                '<div class="ac-icon"><i class="fa-solid fa-plane-arrival"></i></div>' +
+                '<div class="ac-details">' +
+                    '<div class="ac-title"><span class="ac-code-inline">' + r.iata + '</span> &middot; ' + r.name + '</div>' +
+                    '<div class="ac-location"><i class="fa-solid fa-location-dot" style="font-size:10px;margin-right:5px;opacity:0.7;"></i>' + r.city + (r.country ? ', ' + r.country : '') + '</div>' +
+                '</div>' +
+                '<div class="ac-iata-pill">' + r.iata + '</div>' +
                 '</div>';
         });
 
-        selectedIndex = -1;
+        selectedIndex_to = -1;
         list_to.html(divs.join(''))
-            .attr('data-highlight', selectedIndex);
+            .attr('data-highlight', selectedIndex_to)
+            .addClass('open')
+            .show();
 
     } else {
-        numResults = 0;
-        list_to.empty();
+        clearResults_to();
     }
 }
 
 function onKeyDown_to(e) {
+    if (e.which === 27) {
+        clearResults_to();
+        e.stopPropagation();
+        return;
+    }
+
+    if (numResults_to === 0) return;
+
     switch (e.which) {
-        case 38: // up
-            selectedIndex--;
-            if (selectedIndex <= -1) {
-                selectedIndex = -1;
+        case 38: // up arrow
+            selectedIndex_to--;
+            if (selectedIndex_to < 0) {
+                selectedIndex_to = numResults_to - 1;
             }
-            list_to.attr('data-highlight', selectedIndex_to);
-            break;
-        case 13: // enter
-            selectIndex_to(selectedIndex);
-            break;
-        case 9: // enter
-            selectIndex_to(selectedIndex);
+            updateHighlight(list_to, selectedIndex_to);
+            e.preventDefault();
             e.stopPropagation();
-            return;
-        case 40: // down
-            selectedIndex++;
-            if (selectedIndex >= numResults) {
-                selectedIndex = numResults - 1;
+            break;
+
+        case 40: // down arrow
+            selectedIndex_to++;
+            if (selectedIndex_to >= numResults_to) {
+                selectedIndex_to = 0;
             }
-            list_to.attr('data-highlight', selectIndex_to);
+            updateHighlight(list_to, selectedIndex_to);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+
+        case 13: // Enter
+        case 9:  // Tab
+            if (selectedIndex_to >= 0 && selectedIndex_to < numResults_to) {
+                selectIndex_to(selectedIndex_to);
+                if (e.which === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else if (numResults_to > 0) {
+                selectIndex_to(0);
+                if (e.which === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
             break;
 
         default:
-            return; // exit this handler for other keys
+            return;
     }
-    e.stopPropagation();
-    e.preventDefault(); // prevent the default action (scroll / move caret)
 }
+
+function updateHighlight($container, idx) {
+    $container.attr('data-highlight', idx);
+    var $items = $container.find('.autocomplete-result');
+    $items.removeClass('highlighted');
+    if (idx >= 0 && idx < $items.length) {
+        var $active = $items.eq(idx).addClass('highlighted');
+        if ($active.length && $active[0].scrollIntoView) {
+            $active[0].scrollIntoView({ block: 'nearest' });
+        }
+    }
+}
+
+// Global click/touch outside closes dropdowns
+$(document).on('click touchstart', function (e) {
+    if (!$(e.target).closest(wrap).length) {
+        clearResults();
+    }
+    if (!$(e.target).closest(wrap_to).length) {
+        clearResults_to();
+    }
+});
+
+// Swap Airport Button
+$('#swapAirport').on('click', function () {
+    var vFrom = ac.val();
+    var vTo = ac_to.val();
+    ac.val(vTo);
+    ac_to.val(vFrom);
+    clearResults();
+    clearResults_to();
+});

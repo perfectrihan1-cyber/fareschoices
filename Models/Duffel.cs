@@ -37,7 +37,21 @@ namespace Viman.Models
 
     public class DuffelOfferResponseData
     {
+        public string id { get; set; }
         public List<DuffelOffer> offers { get; set; }
+    }
+
+    public class DuffelOffersListResponse
+    {
+        public List<DuffelOffer> data { get; set; }
+        public DuffelMeta meta { get; set; }
+    }
+
+    public class DuffelMeta
+    {
+        public string after { get; set; }
+        public string before { get; set; }
+        public int? limit { get; set; }
     }
 
     public class DuffelOffer

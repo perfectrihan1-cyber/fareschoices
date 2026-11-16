@@ -9,7 +9,7 @@ using Viman.Models;
 
 public class DuffelService
 {
-    private string token = "duffel_test_EvUkj78GJeLB_cXpl43aedOT9vhpSwgABXMeUYr7nd4";
+    private string token = "duffel_live_iCoMKWZ3bOfvy-VogysJeP73dLjYKEXv4jZn7iqGOF8";
 
     //public async Task<List<Flights>> SearchFlights(FlightsSearch search)
     //{

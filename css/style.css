@@ -72,39 +72,39 @@ a {
     font-size: 1em;
     margin: 0;
     padding: 0;
-    color: var(--primary-color) !important;
+    color: var(--primary-color);
     font-weight: 400;
     text-decoration: none;
 }
 
 a:hover {
     text-decoration: none;
-    color: var(--secondary-color) !important;
+    color: var(--secondary-color);
 }
 
 h1 {
     text-shadow: 0 2px 4px rgba(20, 20, 20, 0.5);
-    font-size: 3em !important;
-    font-weight: 700 !important;
-    color: var(--fourth-color) !important;
+    font-size: 3em;
+    font-weight: 700;
+    color: var(--fourth-color);
 }
 
 h2 {
-    font-size: 1.8em !important;
-    color: var(--fifth-color) !important;
-    font-weight: 700 !important;
+    font-size: 1.8em;
+    color: var(--fifth-color);
+    font-weight: 700;
 }
 
 h3 {
-    font-size: 1.3em !important;
-    color: var(--fifth-color) !important;
-    font-weight: 700 !important;
+    font-size: 1.3em;
+    color: var(--fifth-color);
+    font-weight: 700;
 }
 
 h4 {
-    font-size: 1.25em !important;
-    color: var(--fifth-color) !important;
-    font-weight: 700 !important;
+    font-size: 1.25em;
+    color: var(--fifth-color);
+    font-weight: 700;
 }
 
 li {

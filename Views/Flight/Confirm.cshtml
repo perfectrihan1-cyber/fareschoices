@@ -1,4 +1,4 @@
-﻿@model Viman.Models.FlightsBooking
+@model Viman.Models.FlightsBooking
 @using Viman.Models
 @{
     ViewBag.Title = "Confirm";
@@ -51,19 +51,19 @@
                 <div class="ticket-header-sub">
 
                     @(Model.FlightsSearch.FlightWay == FlightWay.RoundTrip ? "Round Trip" : "One Way")
-                    ·
+                    &bull;
                     @Model.Flights.Outbound[0].CabinClass
-                    ·
+                    &bull;
                     @Model.Flights.FlightFare.Adult Adult@(Model.Flights.FlightFare.Adult > 1 ? "s" : "")
 
                     @if (Model.Flights.FlightFare.Child > 0)
                     {
-                        <text> · @Model.Flights.FlightFare.Child Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
+                        <text> &bull; @Model.Flights.FlightFare.Child Child@(Model.Flights.FlightFare.Child > 1 ? "ren" : "")</text>
                     }
 
                     @if (Model.Flights.FlightFare.Infant > 0)
                     {
-                        <text> · @Model.Flights.FlightFare.Infant Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
+                        <text> &bull; @Model.Flights.FlightFare.Infant Infant@(Model.Flights.FlightFare.Infant > 1 ? "s" : "")</text>
                     }
 
                 </div>
@@ -148,7 +148,7 @@
                     <div class="seg-stops">@obStops</div>
 
                     <div class="seg-airline">
-                        @obFirst.Airline.Name · @obFirst.Airline.Code-@obFirst.FlightNo
+                        @obFirst.Airline.Name &bull; @obFirst.Airline.Code-@obFirst.FlightNo
                     </div>
 
                 </div>
@@ -184,7 +184,7 @@
             {
                 <div class="ticket-divider">
                     <div class="td-line"></div>
-                    <div class="td-circle">✂</div>
+                    <div class="td-circle"><i class="fa fa-scissors"></i></div>
                     <div class="td-line"></div>
                 </div>
 
@@ -225,7 +225,7 @@
                         <div class="seg-stops">@ibStops</div>
 
                         <div class="seg-airline">
-                            @ibFirst.Airline.Name · @ibFirst.Airline.Code-@ibFirst.FlightNo
+                            @ibFirst.Airline.Name &bull; @ibFirst.Airline.Code-@ibFirst.FlightNo
                         </div>
 
                     </div>
@@ -306,7 +306,7 @@
                         </div>
 
                         <div class="pax-detail">
-                            @paxType · @gender · DOB:
+                            @paxType &bull; @gender &bull; DOB:
                             @paxItem.DOB.ToString("dd MMM yyyy")
                         </div>
                     </div>

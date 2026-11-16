@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using SqlData.Data;
 using System;
 using System.Collections.Generic;
@@ -92,35 +92,55 @@ namespace Viman.Controllers
             if (Request.QueryString["QS"] == null)
             {
                 string URLStr = Request.RawUrl;
-                string QsStr = URLStr.Split('?')[1];
-                string[] QsArr = QsStr.Split('&');
-                string SiteCode = QsArr[0].Split('=')[1];
-                string SourceMedia = QsArr[1].Split('=')[1];
-                string From = QsArr[2].Split('=')[1];
-                string To = QsArr[3].Split('=')[1];
-                string DepDate = QsArr[4].Split('=')[1];
-                string RetDate = QsArr[5].Split('=')[1];
-                string Adult = QsArr[6].Split('=')[1];
-                string Child = QsArr[7].Split('=')[1];
-                string Infant = QsArr[8].Split('=')[1];
-                string FlightWays = QsArr[9].Split('=')[1];
-                string FlightClass = QsArr[10].Split('=')[1];
-                string Airline = QsArr[11].Split('=')[1];
-                string IsDirect = QsArr[12].Split('=')[1];
-                string IsFlexi = QsArr[13].Split('=')[1];
+                string QsStr = URLStr.Contains("?") ? URLStr.Split('?')[1] : "";
+                string[] QsArr = QsStr.Length > 0 ? QsStr.Split('&') : new string[0];
 
-                string Currency = "GBP";
+                string SiteCode = Request.QueryString["SiteCode"] ?? (QsArr.Length > 0 && QsArr[0].Contains("=") ? QsArr[0].Split('=')[1] : "VIMAN");
+                string SourceMedia = Request.QueryString["SourceMedia"] ?? (QsArr.Length > 1 && QsArr[1].Contains("=") ? QsArr[1].Split('=')[1] : "VIMAN");
+                string From = Request.QueryString["From"] ?? (QsArr.Length > 2 && QsArr[2].Contains("=") ? QsArr[2].Split('=')[1] : "");
+                string To = Request.QueryString["To"] ?? (QsArr.Length > 3 && QsArr[3].Contains("=") ? QsArr[3].Split('=')[1] : "");
+                string DepDate = Request.QueryString["DepDate"] ?? (QsArr.Length > 4 && QsArr[4].Contains("=") ? QsArr[4].Split('=')[1] : "");
+                string RetDate = Request.QueryString["RetDate"] ?? (QsArr.Length > 5 && QsArr[5].Contains("=") ? QsArr[5].Split('=')[1] : "");
+                string Adult = Request.QueryString["Adult"] ?? (QsArr.Length > 6 && QsArr[6].Contains("=") ? QsArr[6].Split('=')[1] : "1");
+                string Child = Request.QueryString["Child"] ?? (QsArr.Length > 7 && QsArr[7].Contains("=") ? QsArr[7].Split('=')[1] : "0");
+                string Infant = Request.QueryString["Infant"] ?? (QsArr.Length > 8 && QsArr[8].Contains("=") ? QsArr[8].Split('=')[1] : "0");
+                string FlightWays = Request.QueryString["FlightWay"] ?? Request.QueryString["FlightWays"] ?? (QsArr.Length > 9 && QsArr[9].Contains("=") ? QsArr[9].Split('=')[1] : "2");
+                string FlightClass = Request.QueryString["FlightClass"] ?? (QsArr.Length > 10 && QsArr[10].Contains("=") ? QsArr[10].Split('=')[1] : "4");
+                string Airline = Request.QueryString["Airline"] ?? (QsArr.Length > 11 && QsArr[11].Contains("=") ? QsArr[11].Split('=')[1] : "");
+                string IsDirect = Request.QueryString["IsDirect"] ?? (QsArr.Length > 12 && QsArr[12].Contains("=") ? QsArr[12].Split('=')[1] : "false");
+                string IsFlexi = Request.QueryString["IsFlexi"] ?? (QsArr.Length > 13 && QsArr[13].Contains("=") ? QsArr[13].Split('=')[1] : "false");
+                string Currency = Request.QueryString["Currency"] ?? "USD";
+
                 string QS = SiteCode + "|" + SourceMedia + "|" + From + "|" + To + "|" + DepDate + "|" + RetDate + "|" + Adult + "|" + Child + "|" + Infant + "|" + FlightWays + "|" + FlightClass + "|" + Airline + "|" + IsDirect + "|" + IsFlexi + "|" + Currency;
                 string QSStr = Common.Encrypt(QS);
-                string newurl = Common.StaticURL + URLStr.Split('?')[0].Substring(1, URLStr.Split('?')[0].Length - 1) + "?qs=" + QSStr;
-                return Redirect(newurl);
 
+                string path = URLStr.Split('?')[0];
+                if (!path.StartsWith("/")) path = "/" + path;
+                string newurl = path + "?qs=" + QSStr;
+                return Redirect(newurl);
             }
             else
             {
-                string decrypturl = Common.Decrypt(Request.QueryString["qs"].ToString());
-                string[] QSArr = decrypturl.Split('|');
-
+                string decrypturl = "";
+                string[] QSArr = null;
+                try
+                {
+                    string rawQs = Request.QueryString["qs"] != null ? Request.QueryString["qs"].ToString().Trim() : "";
+                    if (string.IsNullOrEmpty(rawQs))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    decrypturl = Common.Decrypt(rawQs);
+                    QSArr = decrypturl.Split('|');
+                    if (QSArr.Length < 15)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                catch
+                {
+                    return RedirectToAction("Index", "Home");
+                }
 
                 try
                 {
@@ -251,14 +271,20 @@ namespace Viman.Controllers
                     }
                     catch (Exception e)
                     {
-                        return Redirect("/");
+                        ViewBag.msg = "noresult";
+                        ViewBag.error = e.Message;
+                        FlightsResult errResult = new FlightsResult { FlightsList = new List<Flights>(), Error = e.Message, FlightsSearch = flightSearch };
+                        return View("result", errResult);
                     }
 
                     //------------------------------------
                 }
                 catch (Exception e)
                 {
-                    return Redirect("/");
+                    ViewBag.msg = "noresult";
+                    ViewBag.error = e.Message;
+                    FlightsResult errResult = new FlightsResult { FlightsList = new List<Flights>(), Error = e.Message };
+                    return View("result", errResult);
                 }
             }
 
