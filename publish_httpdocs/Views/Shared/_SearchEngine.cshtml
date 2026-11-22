@@ -1,0 +1,177 @@
+﻿@using (Html.BeginForm("_SearchEngineHome", "Home"))
+{
+
+    <div class="column radio">
+        <div>
+            <input name="flight_way" type="radio" id="rdoRoundtrip" checked="" value="2"
+                   class="flight_way slct_btn onwtrp">
+            <label for="rdoRoundtrip"><span><span></span></span>Round Trip</label>
+        </div>
+        <div>
+            <input name="flight_way" type="radio" value="1" id="rdoOneway"
+                   class="flight_way slct_btn rndtrp trpact">
+            <label for="rdoOneway"><span><span></span></span>One Way</label>
+        </div>
+    </div>
+    <div class="col3 grid grid2">
+        <div class="d-flex">
+            <div class="labelcol">
+                <label for="">Origin</label>
+                <input name="flight_from" type="text" placeholder="Origin" id="flight_from"
+                       onchange="checkdata();" onclick="this.select();"
+                       class="autocomplete_from autocomplete_from_new">
+            </div>
+            
+            <div class="labelcol">
+                <label for="">Destination</label>
+                <input name="flight_to" type="text" placeholder="Destination" id="flight_to"
+                       onchange="checkdata1();" onclick="this.select();"
+                       class="autocomplete_to autocomplete_from_to">
+            </div>
+        </div>
+        <div class="flex">
+            <div class="labelcol">
+                <label for="">Depart Date</label>
+                <input type="text" id="flight_from_date" name="flight_from_date"
+                       placeholder="DD-MM-YYYY" required="">
+            </div>
+            <div class="labelcol">
+                <label for="">Return Date</label>
+                <input type="text" id="flight_to_date" name="flight_to_date"
+                       placeholder="DD-MM-YYYY" required="" >
+            </div>
+        </div>
+        <div class="bottom-section d-flex" style="gap: 5px;">
+            <div class="labelcol">
+                <label for="">Passengers</label>
+                <div class="pax-contents" style="flex: 1;border-radius: 5px;">
+                    <div class="ind_srch_subBox prp_popup">
+                        <div class="prsn_popup" id="prsn_add">
+                            <input type="text" readonly="" name="pass_info" id="pass_info"
+                                   placeholder="1 Pax, Economy" class="ind_inputBox">
+                        </div>
+                        <div class="person_dropdown" id="prsn_popup" style="display: none;">
+                            <ul class="slect_pssngr">
+                                <li>
+                                    <label>Adult &nbsp;<span>(12+ Years)</span></label>
+                                    <div class="count_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="adult"
+                                                data-opt="-"
+                                                class="fa fa-minus inc_der"></em>
+                                        </a>
+                                        <input type="text" style="color: #141414 !important;"
+                                               readonly="" value="1" name="flight_adult"
+                                               id="flight_adult" class="inpt_cout_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="adult"
+                                                data-opt="+"
+                                                class="fa fa-plus inc_der"></em>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <label style="max-width: 125px; line-height: 1.3;">
+                                        Children
+                                        &nbsp;<span>(2-11 Years)</span>
+                                    </label>
+                                    <div class="count_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="child"
+                                                data-opt="-"
+                                                class="fa fa-minus inc_der"></em>
+                                        </a>
+                                        <input type="text" style="color: #141414 !important;"
+                                               readonly="" value="0" name="flight_child"
+                                               id="flight_child" class="inpt_cout_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="child"
+                                                data-opt="+"
+                                                class="fa fa-plus inc_der"></em>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <label>Infant &nbsp;<span>(0-2 Years)</span></label>
+                                    <div class="count_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="infant"
+                                                data-opt="-"
+                                                class="fa fa-minus inc_der"></em>
+                                        </a>
+                                        <input type="text" style="color: #141414 !important;"
+                                               readonly="" value="0" name="flight_infant"
+                                               id="flight_infant" class="inpt_cout_pssngr">
+                                        <a href="javascript:void(0);">
+                                            <em data-field="infant"
+                                                data-opt="+"
+                                                class="fa fa-plus inc_der"></em>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="combin_class">
+                                <ul class="in_list_cls">
+                                    <li>
+                                        <input type="radio" name="flight_class"
+                                               id="flight_class_4" value="4" checked=""> <label for="flight_class_4">Economy</label>
+                                    </li>
+                                    <li>
+                                        <input type="radio" name="flight_class"
+                                               id="flight_class_3" value="3"> <label for="flight_class_3">
+                                            Premium
+                                            Economy
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <input type="radio" name="flight_class"
+                                               id="flight_class_2" value="2"> <label for="flight_class_2">Business</label>
+                                    </li>
+                                    <li>
+                                        <input type="radio" name="flight_class"
+                                               id="flight_class_1" value="1"> <label for="flight_class_1">First</label>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="clss_done" id="ind_done">
+                                <a href="javascript:void(0);" id="prsn_done">Done</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="search_flights">
+                <a onclick="return validateSearchengine();"
+                   name="flight_submit" id="flight_submit" class="search_btn"><span>Search</span> </a>
+            </div>
+        </div>
+    </div>
+
+
+
+}
+
+
+<style>
+    .ui-datepicker {
+        width: 25em !important;
+    }
+
+        .ui-datepicker table {
+            width: 100% !important;
+            margin: 0 !important;
+            font-size: 1em !important;
+        }
+
+        .ui-datepicker th,
+        .ui-datepicker td {
+            padding: 2px !important;
+        }
+</style>
+
+
+<link href="/Content/searchAirport.css" rel="stylesheet" />
+<script src="/scripts/lodash.min.js"></script>
+<script src="/scripts/fuse.min.js"></script>
+<script src="/scripts/airports.js"></script>
+

@@ -1,0 +1,218 @@
+@media (max-width: 1024px) {
+    .row {
+        width: 100%;
+        padding: 20px;
+        margin: auto;
+    }
+
+    h1 {
+        font-size: 1.7em !important;
+    }
+
+    h2 {
+        font-size: 1.4em !important;
+    }
+
+    h3 {
+        font-size: 1.2em !important;
+    }
+
+    button {
+        font-size: 14px;
+    }
+
+    .gap,
+    .gap3 {
+        gap: 10px;
+    }
+
+    .newheader {
+        width: 100% !important;
+    }
+
+    .newheader .latesthide {
+        display: none;
+    }
+
+    .newheader .newhead {
+        width: 100% !important;
+        padding: 10px 20px;
+    }
+
+    .newheader .newhead .icon {
+        margin: auto 0;
+        flex: 1;
+    }
+
+    .newheader .newhead .left img {
+        width: 100px;
+    }
+
+    .newheader .right {
+        text-align: center;
+        flex: 1;
+    }
+
+    .navigate {
+        z-index: 99;
+        display: none;
+        position: absolute;
+        background-color: var(--fourth-color);
+        box-shadow: 0px 2px 2px rgba(20, 20, 20, 0.5);
+        padding: 30px;
+        top: 0;
+        right: 0;
+        width: 60%;
+        height: 100vh;
+        border: none;
+    }
+
+    .navigate ul {
+        flex-direction: column;
+        gap: 5px !important;
+    }
+
+    .navigate ul li {
+        margin: 0;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .navigate ul a {
+        color: var(--fifth-color) !important;
+    }
+
+    #on,
+    #off {
+        display: block !important;
+        font-size: 22px;
+        text-align: right;
+        color: var(--fifth-color);
+    }
+
+    #on {
+        color: #000000;
+        max-width: 30px;
+    }
+
+    .cta {
+        display: block;
+    }
+
+    .cta a {
+        color: var(--fourth-color) !important;
+        line-height: 1.5;
+    }
+
+    .grid1,
+    .grid2,
+    .grid3 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5em !important;
+    }
+
+    h2 {
+        font-size: 1.3em !important;
+    }
+
+    h3 {
+        font-size: 1.17em !important;
+    }
+
+    .d-flex {
+        flex-direction: column;
+    }
+
+    .grid1,
+    .grid2,
+    .grid3 {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+
+    .newfooter {
+        padding-bottom: 50px;
+    }
+
+    .newfooter .grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .newfooter .row {
+        padding-top: 30px;
+    }
+
+    .newheader .right a {
+        font-size: 13px;
+    }
+
+    .newheader .newhead .left img {
+        width: 125px;
+    }
+
+    .BannerBg .row {
+        padding-block: 70px 20px !important;
+    }
+
+    .BannerBg p {
+        display: none;
+    }
+
+    .intro .img {
+        margin-right: auto;
+    }
+
+    .mainslider .slide1,
+    .mainslider1 .slide2,
+    .mainslider2 .slide3 {
+        min-width: calc(100% - 16px);
+        max-width: calc(100% - 16px);
+    }
+
+    .textmedia .column:first-child {
+        padding: 20px;
+    }
+
+    .textmedia .column:last-child {
+        height: 250px;
+    }
+
+    .herobg .row {
+        padding-top: 70px;
+    }
+
+    .TrainSeat img {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .TrainSeat .content {
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .HOTELS .innercol {
+        padding: 15px;
+        margin-top: 150px;
+        height:auto;
+    }
+
+    .subsribeSec .column {
+        padding: 15px;
+        height: auto;
+    }
+
+    .overview .grid4 {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+
+    .popup .column {
+        max-width: 90%;
+    }
+}

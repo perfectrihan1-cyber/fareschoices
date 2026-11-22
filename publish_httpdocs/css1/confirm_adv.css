@@ -1,0 +1,352 @@
+/* ═══════════════════════════════════════════════════════════════════
+   FARESCHOICES - ADVANCED CONFIRMATION & E-TICKET STYLESHEET
+   ═══════════════════════════════════════════════════════════════════ */
+
+.confirm-page-wrap {
+  max-width: 1040px;
+  margin: 40px auto 70px;
+  padding: 0 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+}
+
+/* ── SUCCESS BANNER ── */
+.confirm-status-card {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-radius: 18px 18px 0 0;
+  padding: 32px 36px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 4px 20px rgba(5, 150, 105, 0.2);
+}
+
+.confirm-status-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.confirm-status-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.confirm-status-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
+.confirm-status-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.confirm-actions-bar {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.btn-confirm-print {
+  background: #ffffff;
+  color: #047857;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-print:hover {
+  background: #f0fdf4;
+  transform: translateY(-1px);
+}
+
+/* ── CONFIRM BODY CONTAINER ── */
+.confirm-body-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 18px 18px;
+  padding: 36px 40px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* Header strip with logo & booking id */
+.confirm-header-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #f1f5f9;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.confirm-logo-wrap img {
+  height: 38px;
+  width: auto;
+}
+
+.confirm-id-box {
+  text-align: right;
+}
+
+.confirm-id-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.confirm-id-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0e1b4d;
+}
+
+.confirm-grid-2col {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+}
+
+/* ── FLIGHT CARDS ── */
+.confirm-flight-section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0e1b4d;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirm-leg-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.confirm-leg-header {
+  background: #0e1b4d;
+  color: #ffffff;
+  padding: 12px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.confirm-leg-segment {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.confirm-leg-segment:last-child {
+  border-bottom: none;
+}
+
+.confirm-airline-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.confirm-airline-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 4px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.confirm-airline-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.confirm-flight-no {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.confirm-airport-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirm-iata {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0e1b4d;
+}
+
+.confirm-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.confirm-ap-name {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.confirm-stopover-bar {
+  background: #fff7ed;
+  border-top: 1px dashed #fed7aa;
+  border-bottom: 1px dashed #fed7aa;
+  padding: 8px 20px;
+  font-size: 12px;
+  color: #9a3412;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── PASSENGER & SUMMARY TABLES ── */
+.confirm-card-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.confirm-card-box h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0e1b4d;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.confirm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.confirm-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: #64748b;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.confirm-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.confirm-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Price rows */
+.confirm-price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.confirm-price-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0 0;
+  margin-top: 10px;
+  border-top: 2px solid #cbd5e1;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0e1b4d;
+}
+
+/* ── SUPPORT FOOTER ── */
+.confirm-support-strip {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.confirm-support-text {
+  font-size: 13.5px;
+  color: #1e40af;
+}
+
+.confirm-support-phone {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0770e3;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media print {
+  body { background: #ffffff !important; }
+  .site-nav, .site-footer, .btn-confirm-print { display: none !important; }
+  .confirm-page-wrap { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+  .confirm-status-card { border-radius: 0 !important; }
+  .confirm-body-card { border-radius: 0 !important; box-shadow: none !important; }
+}
+
+@media (max-width: 860px) {
+  .confirm-grid-2col { grid-template-columns: 1fr; }
+  .confirm-status-card { flex-direction: column; align-items: flex-start; }
+  .confirm-actions-bar { width: 100%; }
+  .confirm-leg-segment { grid-template-columns: 1fr; gap: 12px; }
+  .confirm-body-card { padding: 24px 18px; }
+}
